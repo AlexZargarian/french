@@ -4,6 +4,8 @@ import ssl
 import certifi
 import time
 import logging
+import random
+from datetime import datetime
 from tlscontact_steps import TLSContactSteps
 from selenium.common.exceptions import NoSuchWindowException, WebDriverException
 
@@ -12,8 +14,18 @@ os.environ['SSL_CERT_FILE'] = certifi.where()
 os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
 ssl._create_default_https_context = ssl._create_unverified_context
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Setup logging to file
+log_filename = f"tls_automation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler()  # Also print to console
+    ]
+)
 logger = logging.getLogger(__name__)
+
 
 def create_stable_driver():
     """Create a stable Chrome driver with proper error handling"""
@@ -72,6 +84,7 @@ def create_stable_driver():
         logger.error(f"❌ Failed to create Chrome driver: {e}")
         return None
 
+
 # ===== Helpers =====
 
 def wait_for_cloudflare_or_recover(driver, seconds, url, recreate_driver_cb):
@@ -90,19 +103,23 @@ def wait_for_cloudflare_or_recover(driver, seconds, url, recreate_driver_cb):
         time.sleep(1)
     return driver
 
+
 def safe_switch_to_any_window(driver):
     handles = driver.window_handles
     if not handles:
         raise NoSuchWindowException("No window handles")
     driver.switch_to.window(handles[0])
 
+
 def safe_current_url(driver):
     safe_switch_to_any_window(driver)
     return driver.current_url
 
+
 def safe_title(driver):
     safe_switch_to_any_window(driver)
     return driver.title
+
 
 def ensure_window_alive(driver, url=None, recreate_driver_cb=None):
     try:
@@ -121,7 +138,9 @@ def ensure_window_alive(driver, url=None, recreate_driver_cb=None):
             return new_driver
         raise
 
-def main():
+
+def run_single_attempt():
+    """Run a single automation attempt"""
     driver = None
     try:
         logger.info("🚀 Starting TLSContact Automation...")
@@ -129,7 +148,7 @@ def main():
         driver = create_stable_driver()
         if not driver:
             logger.error("❌ Could not initialize browser")
-            return
+            return False
 
         time.sleep(2)
 
@@ -146,7 +165,7 @@ def main():
                 logger.info("✅ Second navigation attempt successful")
             except Exception as retry_error:
                 logger.error(f"❌ Both navigation attempts failed: {retry_error}")
-                return
+                return False
 
         logger.info("⏳ Waiting for Cloudflare (30 seconds)...")
         driver = wait_for_cloudflare_or_recover(driver, 30, url, create_stable_driver)
@@ -160,7 +179,7 @@ def main():
             logger.error("❌ Window closed before reading URL/title. Recreating…")
             driver = create_stable_driver()
             if not driver:
-                return
+                return False
             driver.get(url)
             current_url = safe_current_url(driver)
             page_title = safe_title(driver)
@@ -186,14 +205,13 @@ def main():
         else:
             logger.error("❌ Some steps failed - check the logs and screenshots")
 
-        # Keep browser open for inspection
-        logger.info("🖥️ Browser will remain open for 60 seconds...")
-        time.sleep(60)
+        return success
 
     except Exception as e:
-        logger.error(f"❌ Unexpected error: {e}")
+        logger.error(f"❌ Unexpected error in automation attempt: {e}")
         import traceback
-        logger.error(traceback.format_exc())
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
 
     finally:
         if driver:
@@ -202,6 +220,58 @@ def main():
                 logger.info("🔚 Browser closed.")
             except Exception:
                 logger.info("Browser already closed or couldn't be closed properly.")
+
+
+def main():
+    """Main function that runs the automation continuously"""
+    attempt_count = 0
+    success_count = 0
+    failure_count = 0
+
+    logger.info("🔄 Starting continuous TLSContact automation...")
+    logger.info(f"📝 Logs are being saved to: {log_filename}")
+
+    while True:
+        attempt_count += 1
+        logger.info(f"\n{'=' * 60}")
+        logger.info(f"🔄 ATTEMPT #{attempt_count} - Starting at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info(f"{'=' * 60}")
+
+        try:
+            success = run_single_attempt()
+
+            if success:
+                success_count += 1
+                logger.info(f"✅ Attempt #{attempt_count} completed successfully!")
+                logger.info(
+                    f"📊 Stats: {success_count} successes, {failure_count} failures out of {attempt_count} total attempts")
+
+                # RESTART IMMEDIATELY after success
+                logger.info("🔄 Restarting immediately for next attempt...")
+
+            else:
+                failure_count += 1
+                logger.error(f"❌ Attempt #{attempt_count} failed!")
+                logger.info(
+                    f"📊 Stats: {success_count} successes, {failure_count} failures out of {attempt_count} total attempts")
+
+                # RESTART IMMEDIATELY after failure
+                logger.info("🔄 Restarting immediately after failure...")
+
+        except KeyboardInterrupt:
+            logger.info("\n🛑 Automation stopped by user")
+            logger.info(
+                f"📊 Final Stats: {success_count} successes, {failure_count} failures out of {attempt_count} total attempts")
+            break
+        except Exception as e:
+            failure_count += 1
+            logger.error(f"💥 Critical error in main loop: {e}")
+            logger.info(
+                f"📊 Stats: {success_count} successes, {failure_count} failures out of {attempt_count} total attempts")
+
+            # RESTART IMMEDIATELY after critical error
+            logger.info("🔄 Restarting immediately after critical error...")
+
 
 if __name__ == "__main__":
     main()

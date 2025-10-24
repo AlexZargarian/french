@@ -36,7 +36,7 @@ class TLSContactSteps:
                 }
             """)
             self.human_delay(0.5, 1)
-            logger.debug("✅ URL bar focus removed")
+            logger.debug(" URL bar focus removed")
             return True
         except Exception as e:
             logger.warning(f"Could not remove URL bar focus: {e}")
@@ -68,7 +68,7 @@ class TLSContactSteps:
             element.send_keys(Keys.DELETE)
             self.human_delay(0.2, 0.4)
 
-            logger.debug("✅ Email field focus cleared")
+            logger.debug(" Email field focus cleared")
             return True
         except Exception as e:
             logger.warning(f"Could not clear email field focus: {e}")
@@ -98,7 +98,7 @@ class TLSContactSteps:
                 }
             """)
             self.human_delay(0.3, 0.6)
-            logger.debug("✅ Page focus ensured")
+            logger.debug(" Page focus ensured")
             return True
         except Exception as e:
             logger.warning(f"Could not ensure page focus: {e}")
@@ -274,11 +274,11 @@ class TLSContactSteps:
             WebDriverWait(self.driver, timeout).until(
                 EC.url_contains(url_part)
             )
-            logger.info(f"✅ Successfully reached page containing: {url_part}")
+            logger.info(f"Successfully reached page containing: {url_part}")
             self.wait_for_page_load()
             return True
         except TimeoutException:
-            logger.error(f"❌ Timeout waiting for URL to contain: {url_part}")
+            logger.error(f" Timeout waiting for URL to contain: {url_part}")
             return False
 
     def wait_until_app_domain(self, prefix="https://visas-fr.tlscontact.com/en-us/", timeout=60):
@@ -293,7 +293,7 @@ class TLSContactSteps:
                 return url.startswith(prefix)
 
             WebDriverWait(self.driver, timeout).until(on_app_prefix)
-            logger.info(f"✅ Returned to app domain. URL: {self.driver.current_url}")
+            logger.info(f" Returned to app domain. URL: {self.driver.current_url}")
 
             try:
                 WebDriverWait(self.driver, 30).until(
@@ -302,7 +302,7 @@ class TLSContactSteps:
                         "//*[contains(., 'Select') or contains(@href,'workflow') or contains(@href,'service-level')]"
                     ))
                 )
-                logger.info("✅ Post-login page marker detected (list/workflow link).")
+                logger.info(" Post-login page marker detected (list/workflow link).")
             except TimeoutException:
                 logger.warning("⚠️ Post-login marker not detected yet; proceeding anyway.")
 
@@ -310,7 +310,7 @@ class TLSContactSteps:
             return True
         except TimeoutException:
             logger.error(
-                f"❌ Did not reach app domain with prefix: {prefix} within {timeout}s. Current URL: {self.driver.current_url}")
+                f" Did not reach app domain with prefix: {prefix} within {timeout}s. Current URL: {self.driver.current_url}")
             return False
 
     def take_screenshot(self, filename):
@@ -331,7 +331,7 @@ class TLSContactSteps:
         """Check if we're already on the service level page"""
         current_url = self.driver.current_url
         if "workflow/service-level" in current_url or "23012573/workflow" in current_url:
-            logger.info("✅ Already on target service level page")
+            logger.info(" Already on target service level page")
             return True
         return False
 
@@ -350,7 +350,7 @@ class TLSContactSteps:
 
         for selector in book_appointment_selectors:
             if self.safe_click(selector):
-                logger.info("✅ Successfully clicked 'Book an appointment'")
+                logger.info("Successfully clicked 'Book an appointment'")
                 self.wait_for_page_load()
                 return True
 
@@ -361,11 +361,11 @@ class TLSContactSteps:
 
         for xpath in xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked 'Book an appointment' (XPath)")
+                logger.info(" Successfully clicked 'Book an appointment' (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find 'Book an appointment' button")
+        logger.error(" Could not find 'Book an appointment' button")
         return False
 
     def step2_click_france_visas_yes(self):
@@ -383,7 +383,7 @@ class TLSContactSteps:
 
         for selector in france_visas_yes_selectors:
             if self.safe_click(selector):
-                logger.info("✅ Successfully clicked 'Yes' for France-Visas question")
+                logger.info(" Successfully clicked 'Yes' for France-Visas question")
                 self.wait_for_page_load()
                 return True
 
@@ -394,11 +394,11 @@ class TLSContactSteps:
 
         for xpath in france_visas_xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked 'Yes' for France-Visas question (XPath)")
+                logger.info(" Successfully clicked 'Yes' for France-Visas question (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find France-Visas 'Yes' button")
+        logger.error(" Could not find France-Visas 'Yes' button")
         return False
 
     def step3_click_tlscontact_yes(self):
@@ -422,7 +422,7 @@ class TLSContactSteps:
                 actions.click()
                 actions.perform()
 
-                logger.info("✅ Successfully clicked second 'Yes' button")
+                logger.info(" Successfully clicked second 'Yes' button")
                 self.wait_for_page_load()
                 return True
         except:
@@ -435,11 +435,11 @@ class TLSContactSteps:
 
         for xpath in tlscontact_xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked 'Yes' for TLScontact question (XPath)")
+                logger.info(" Successfully clicked 'Yes' for TLScontact question (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find TLScontact 'Yes' button")
+        logger.error(" Could not find TLScontact 'Yes' button")
         return False
 
     def step4_click_login_button(self):
@@ -457,7 +457,7 @@ class TLSContactSteps:
 
         for selector in login_selectors:
             if self.safe_click(selector):
-                logger.info("✅ Successfully clicked 'LOG IN' button")
+                logger.info(" Successfully clicked 'LOG IN' button")
                 self.wait_for_page_load()
                 return True
 
@@ -468,11 +468,11 @@ class TLSContactSteps:
 
         for xpath in login_xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked 'LOG IN' button (XPath)")
+                logger.info(" Successfully clicked 'LOG IN' button (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find 'LOG IN' button")
+        logger.error(" Could not find 'LOG IN' button")
         return False
 
     def step5_enter_email(self):
@@ -502,7 +502,7 @@ class TLSContactSteps:
 
                 # Now type the email using the special email typing method
                 if self.safe_type_email(selector, email):
-                    logger.info(f"✅ Successfully entered email: {email}")
+                    logger.info(f" Successfully entered email: {email}")
                     return True
             except Exception as e:
                 logger.warning(f"Email selector {selector} failed: {e}")
@@ -523,13 +523,13 @@ class TLSContactSteps:
                 self.driver.execute_script("arguments[0].blur(); arguments[0].value = '';", element)
 
                 if self.safe_type_email(xpath, email, By.XPATH):
-                    logger.info(f"✅ Successfully entered email (XPath): {email}")
+                    logger.info(f" Successfully entered email (XPath): {email}")
                     return True
             except Exception as e:
                 logger.warning(f"Email XPath {xpath} failed: {e}")
                 continue
 
-        logger.error("❌ Could not find email input field")
+        logger.error(" Could not find email input field")
         return False
 
     def step6_enter_password(self):
@@ -551,7 +551,7 @@ class TLSContactSteps:
 
         for selector in password_selectors:
             if self.safe_type(selector, password):
-                logger.info("✅ Successfully entered password")
+                logger.info(" Successfully entered password")
                 return True
 
         password_xpaths = [
@@ -562,10 +562,10 @@ class TLSContactSteps:
 
         for xpath in password_xpaths:
             if self.safe_type(xpath, password, By.XPATH):
-                logger.info("✅ Successfully entered password (XPath)")
+                logger.info(" Successfully entered password (XPath)")
                 return True
 
-        logger.error("❌ Could not find password input field")
+        logger.error(" Could not find password input field")
         return False
 
     def step7_click_login_submit(self):
@@ -584,7 +584,7 @@ class TLSContactSteps:
 
         for selector in login_submit_selectors:
             if self.safe_click(selector):
-                logger.info("✅ Successfully clicked Login submit button")
+                logger.info(" Successfully clicked Login submit button")
                 self.wait_for_page_load()
                 return True
 
@@ -596,11 +596,11 @@ class TLSContactSteps:
 
         for xpath in login_submit_xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked Login submit button (XPath)")
+                logger.info(" Successfully clicked Login submit button (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find Login submit button")
+        logger.error(" Could not find Login submit button")
         return False
 
     def step8_click_select_button(self):
@@ -628,7 +628,7 @@ class TLSContactSteps:
                 self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
                 self.human_delay(1, 2)
                 self.driver.execute_script("arguments[0].click();", element)
-                logger.info(f"✅ Successfully clicked using selector: {selector}")
+                logger.info(f"Successfully clicked using selector: {selector}")
                 self.human_delay(2, 4)
                 return True
             except Exception as e:
@@ -648,7 +648,7 @@ class TLSContactSteps:
             self.human_delay(1, 2)
 
             self.driver.execute_script("arguments[0].click();", button)
-            logger.info("✅ Successfully clicked Select button using JavaScript after explicit wait")
+            logger.info(" Successfully clicked Select button using JavaScript after explicit wait")
             self.human_delay(2, 4)
             return True
         except Exception as e:
@@ -669,17 +669,17 @@ class TLSContactSteps:
                 self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
                 self.human_delay(1, 2)
                 self.driver.execute_script("arguments[0].click();", element)
-                logger.info(f"✅ Successfully clicked using XPath: {xpath}")
+                logger.info(f" Successfully clicked using XPath: {xpath}")
                 self.human_delay(2, 4)
                 return True
             except Exception as e:
                 logger.warning(f"XPath {xpath} failed: {e}")
 
         if self.check_if_already_on_target_page():
-            logger.info("✅ Already on service level page - no need to click Select button")
+            logger.info(" Already on service level page - no need to click Select button")
             return True
 
-        logger.error("❌ All strategies failed to click Select button")
+        logger.error(" All strategies failed to click Select button")
         return False
 
     def step9_wait_for_service_level_page(self):
@@ -690,14 +690,14 @@ class TLSContactSteps:
 
         for url_part in target_url_parts:
             if self.wait_for_url_contains(url_part, timeout=30):
-                logger.info(f"✅ Successfully reached service level page (matched: {url_part})")
+                logger.info(f" Successfully reached service level page (matched: {url_part})")
                 return True
 
         if self.check_if_already_on_target_page():
-            logger.info("✅ Already on service level page")
+            logger.info(" Already on service level page")
             return True
 
-        logger.error("❌ Failed to reach service level page")
+        logger.error(" Failed to reach service level page")
         return False
 
     def step10_click_continue_button(self):
@@ -738,7 +738,7 @@ class TLSContactSteps:
                         self.driver.switch_to.window(window_handle)
                         break
 
-                logger.info("✅ Successfully opened Continue link in new tab")
+                logger.info(" Successfully opened Continue link in new tab")
                 self.wait_for_page_load()
                 return True
 
@@ -748,7 +748,7 @@ class TLSContactSteps:
 
         for selector in continue_selectors:
             if self.safe_click(selector):
-                logger.info("✅ Successfully clicked Continue button (normal click)")
+                logger.info(" Successfully clicked Continue button (normal click)")
                 self.wait_for_page_load()
                 return True
 
@@ -761,11 +761,11 @@ class TLSContactSteps:
 
         for xpath in continue_xpaths:
             if self.safe_click_by_xpath(xpath):
-                logger.info("✅ Successfully clicked Continue button (XPath)")
+                logger.info(" Successfully clicked Continue button (XPath)")
                 self.wait_for_page_load()
                 return True
 
-        logger.error("❌ Could not find Continue button")
+        logger.error(" Could not find Continue button")
         return False
 
     def step11_check_appointment_availability(self):
@@ -790,13 +790,13 @@ class TLSContactSteps:
             try:
                 no_slots_element = self.driver.find_element(By.XPATH, xpath)
                 if no_slots_element.is_displayed():
-                    logger.info("❌ No appointment slots available message detected")
+                    logger.info(" No appointment slots available message detected")
                     print("No time")
                     return True
             except:
                 continue
 
-        logger.info("✅ Appointment slots appear to be available")
+        logger.info(" Appointment slots appear to be available")
         print("Yes time")
         return True
 
@@ -829,7 +829,7 @@ class TLSContactSteps:
                 continue
 
             if not step_function():
-                logger.error(f"❌ Failed at step: {step_name}")
+                logger.error(f" Failed at step: {step_name}")
                 return False
             self.human_delay(2, 4)
 
