@@ -454,27 +454,7 @@ class TLSContactSteps:
 
         self.take_screenshot("before_select_button.png")
 
-        logger.info("🔄 Strategy 1: Waiting for button to be clickable...")
-        try:
-            button = WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "button[value='23012573']"))
-            )
-
-            button = WebDriverWait(self.driver, 20).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[value='23012573']"))
-            )
-
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-            self.human_delay(1, 2)
-
-            self.driver.execute_script("arguments[0].click();", button)
-            logger.info("✅ Successfully clicked Select button using JavaScript after explicit wait")
-            self.human_delay(2, 4)
-            return True
-        except Exception as e:
-            logger.warning(f"Strategy 1 failed: {e}")
-
-        logger.info("🔄 Strategy 2: Trying alternative selectors...")
+        logger.info("🔄 Strategy 1: Trying alternative selectors...")
         alternative_selectors = [
             "button[value='23012573']",
             "button[name='formGroupId'][value='23012573']",
@@ -495,6 +475,26 @@ class TLSContactSteps:
                 return True
             except Exception as e:
                 logger.warning(f"Selector {selector} failed: {e}")
+
+        logger.info("🔄 Strategy 2: Waiting for button to be clickable...")
+        try:
+            button = WebDriverWait(self.driver, 20).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "button[value='23012573']"))
+            )
+
+            button = WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[value='23012573']"))
+            )
+
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
+            self.human_delay(1, 2)
+
+            self.driver.execute_script("arguments[0].click();", button)
+            logger.info("✅ Successfully clicked Select button using JavaScript after explicit wait")
+            self.human_delay(2, 4)
+            return True
+        except Exception as e:
+            logger.warning(f"Strategy 2 failed: {e}")
 
         logger.info("🔄 Strategy 3: Trying XPaths...")
         xpaths = [

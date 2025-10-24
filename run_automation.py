@@ -15,7 +15,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
 def create_stable_driver():
     """Create a stable Chrome driver with proper error handling"""
     try:
