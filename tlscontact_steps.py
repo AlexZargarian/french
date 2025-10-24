@@ -17,6 +17,63 @@ class TLSContactSteps:
         self.driver = driver
         self.wait = WebDriverWait(driver, 15)
 
+    def remove_url_bar_focus(self):
+        """Remove focus from URL bar to eliminate vertical bar in address bar"""
+        try:
+            # Click on page body to remove focus from URL bar
+            self.driver.execute_script("""
+                if (document.body) {
+                    document.body.focus();
+                    document.body.click();
+                }
+            """)
+            # Also try to focus on the first input field or any element on the page
+            self.driver.execute_script("""
+                var firstInput = document.querySelector('input, button, div, body');
+                if (firstInput) {
+                    firstInput.focus();
+                    firstInput.blur();
+                }
+            """)
+            self.human_delay(0.5, 1)
+            logger.debug("✅ URL bar focus removed")
+            return True
+        except Exception as e:
+            logger.warning(f"Could not remove URL bar focus: {e}")
+            return False
+
+    def clear_email_field_focus(self, selector, by=By.CSS_SELECTOR):
+        """Clear any vertical bar/cursor from email field"""
+        try:
+            element = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((by, selector))
+            )
+
+            # Multiple strategies to clear field focus
+            self.driver.execute_script("""
+                arguments[0].blur();
+                arguments[0].value = '';
+            """, element)
+
+            # Click away and then back to the element
+            body = self.driver.find_element(By.TAG_NAME, 'body')
+            body.click()
+            self.human_delay(0.3, 0.6)
+
+            element.click()
+            self.human_delay(0.3, 0.6)
+
+            # Clear using keyboard
+            element.send_keys(Keys.COMMAND + "a" if os.name == 'posix' else Keys.CONTROL + "a")
+            element.send_keys(Keys.DELETE)
+            self.human_delay(0.2, 0.4)
+
+            logger.debug("✅ Email field focus cleared")
+            return True
+        except Exception as e:
+            logger.warning(f"Could not clear email field focus: {e}")
+            return False
+
     def human_delay(self, min_sec=1, max_sec=3):
         """Add human-like random delays"""
         time.sleep(random.uniform(min_sec, max_sec))
@@ -24,11 +81,20 @@ class TLSContactSteps:
     def ensure_page_focus(self):
         """Ensure focus is on the page, not the URL bar"""
         try:
-            # Click on the body to take focus away from URL bar
+            # Enhanced focus removal
+            self.remove_url_bar_focus()
+
+            # Additional focus on page content
             self.driver.execute_script("""
                 if (document.body) {
                     document.body.focus();
                     document.body.click();
+                    // Try to focus on any visible element
+                    var visibleElement = document.querySelector('input, button, a, div[tabindex]');
+                    if (visibleElement && visibleElement.offsetParent !== null) {
+                        visibleElement.focus();
+                        visibleElement.blur();
+                    }
                 }
             """)
             self.human_delay(0.3, 0.6)
@@ -41,7 +107,8 @@ class TLSContactSteps:
     def safe_click(self, selector, by=By.CSS_SELECTOR, timeout=10):
         """Safely click an element with waiting and retry"""
         try:
-            # Ensure focus is on page first
+            # Ensure focus is on page first and remove URL bar focus
+            self.remove_url_bar_focus()
             self.ensure_page_focus()
 
             element = WebDriverWait(self.driver, timeout).until(
@@ -68,6 +135,7 @@ class TLSContactSteps:
         """Safely click an element using XPath"""
         try:
             # Ensure focus is on page first
+            self.remove_url_bar_focus()
             self.ensure_page_focus()
 
             element = WebDriverWait(self.driver, timeout).until(
@@ -93,6 +161,7 @@ class TLSContactSteps:
         """Safely type text into an input field - prevent autofill"""
         try:
             # Ensure focus is on page first
+            self.remove_url_bar_focus()
             self.ensure_page_focus()
 
             element = WebDriverWait(self.driver, timeout).until(
@@ -132,6 +201,58 @@ class TLSContactSteps:
             logger.warning(f"Could not type in {selector}: {e}")
             return False
 
+    def safe_type_email(self, selector, text, by=By.CSS_SELECTOR, timeout=10):
+        """Safely type email with vertical bar focus clearing"""
+        try:
+            # Ensure focus is on page first
+            self.remove_url_bar_focus()
+            self.ensure_page_focus()
+
+            element = WebDriverWait(self.driver, timeout).until(
+                EC.element_to_be_clickable((by, selector))
+            )
+
+            # Scroll into view
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+            self.human_delay(0.3, 0.6)
+
+            # Clear any existing values and set autocomplete off
+            self.driver.execute_script("""
+                arguments[0].setAttribute('autocomplete', 'off');
+                arguments[0].setAttribute('autocorrect', 'off');
+                arguments[0].setAttribute('autocapitalize', 'off');
+                arguments[0].setAttribute('spellcheck', 'false');
+                arguments[0].value = '';
+            """, element)
+
+            # Clear field focus first
+            self.driver.execute_script("arguments[0].blur();", element)
+            self.human_delay(0.2, 0.4)
+
+            # Click the field first like a human would
+            element.click()
+            self.human_delay(0.3, 0.7)
+
+            # Clear using keyboard shortcuts (more human-like)
+            element.send_keys(Keys.COMMAND + "a" if os.name == 'posix' else Keys.CONTROL + "a")
+            element.send_keys(Keys.DELETE)
+            self.human_delay(0.2, 0.5)
+
+            # Type character by character like a human
+            for char in text:
+                element.send_keys(char)
+                time.sleep(random.uniform(0.03, 0.1))
+
+            self.human_delay(0.5, 1)
+
+            # Blur the field after typing to remove cursor
+            self.driver.execute_script("arguments[0].blur();", element)
+
+            return True
+        except Exception as e:
+            logger.warning(f"Could not type email in {selector}: {e}")
+            return False
+
     def wait_for_page_load(self, timeout=30):
         """Wait for page to fully load"""
         try:
@@ -140,6 +261,7 @@ class TLSContactSteps:
             )
             self.human_delay(2, 4)
             # Ensure focus after page load
+            self.remove_url_bar_focus()
             self.ensure_page_focus()
             return True
         except:
@@ -187,15 +309,23 @@ class TLSContactSteps:
             self.wait_for_page_load()
             return True
         except TimeoutException:
-            self.take_screenshot("still_on_auth_or_wrong_domain.png")
             logger.error(
                 f"❌ Did not reach app domain with prefix: {prefix} within {timeout}s. Current URL: {self.driver.current_url}")
             return False
 
     def take_screenshot(self, filename):
-        """Take screenshot of current state"""
+        """Take screenshot of current state and delete existing one"""
+        try:
+            # Delete existing screenshot if it exists
+            if os.path.exists(filename):
+                os.remove(filename)
+                logger.info(f"🗑️  Deleted existing screenshot: {filename}")
+        except Exception as e:
+            logger.warning(f"Could not delete existing screenshot: {e}")
+
+        # Take new screenshot
         self.driver.save_screenshot(filename)
-        logger.info(f"Screenshot saved: {filename}")
+        logger.info(f"📸 Screenshot saved: {filename}")
 
     def check_if_already_on_target_page(self):
         """Check if we're already on the service level page"""
@@ -210,6 +340,7 @@ class TLSContactSteps:
         logger.info("Step 1: Clicking 'Book an appointment' button...")
 
         # Ensure page focus before starting
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
         self.human_delay(1, 2)
 
@@ -242,6 +373,7 @@ class TLSContactSteps:
         logger.info("Step 2: Clicking 'Yes' for France-Visas question...")
 
         self.human_delay(2, 4)
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
         france_visas_yes_selectors = [
@@ -274,6 +406,7 @@ class TLSContactSteps:
         logger.info("Step 3: Clicking 'Yes' for TLScontact registration question...")
 
         self.human_delay(2, 4)
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
         try:
@@ -314,6 +447,7 @@ class TLSContactSteps:
         logger.info("Step 4: Clicking 'LOG IN' button...")
 
         self.human_delay(2, 4)
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
         login_selectors = [
@@ -342,10 +476,13 @@ class TLSContactSteps:
         return False
 
     def step5_enter_email(self):
-        """Step 5: Enter email in the email input field"""
+        """Step 5: Enter email in the email input field - with vertical bar fix"""
         logger.info("Step 5: Entering email address...")
 
         self.human_delay(2, 4)
+
+        # First remove URL bar focus
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
         email = os.getenv("TLS_EMAIL", "simonyangor026@gmail.com")
@@ -359,9 +496,17 @@ class TLSContactSteps:
         ]
 
         for selector in email_selectors:
-            if self.safe_type(selector, email):
-                logger.info(f"✅ Successfully entered email: {email}")
-                return True
+            try:
+                # First clear any existing focus/vertical bar from the field
+                self.clear_email_field_focus(selector)
+
+                # Now type the email using the special email typing method
+                if self.safe_type_email(selector, email):
+                    logger.info(f"✅ Successfully entered email: {email}")
+                    return True
+            except Exception as e:
+                logger.warning(f"Email selector {selector} failed: {e}")
+                continue
 
         email_xpaths = [
             "//input[@id='email-input-field']",
@@ -370,9 +515,19 @@ class TLSContactSteps:
         ]
 
         for xpath in email_xpaths:
-            if self.safe_type(xpath, email, By.XPATH):
-                logger.info(f"✅ Successfully entered email (XPath): {email}")
-                return True
+            try:
+                # Clear focus for XPath elements too
+                element = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, xpath))
+                )
+                self.driver.execute_script("arguments[0].blur(); arguments[0].value = '';", element)
+
+                if self.safe_type_email(xpath, email, By.XPATH):
+                    logger.info(f"✅ Successfully entered email (XPath): {email}")
+                    return True
+            except Exception as e:
+                logger.warning(f"Email XPath {xpath} failed: {e}")
+                continue
 
         logger.error("❌ Could not find email input field")
         return False
@@ -380,6 +535,9 @@ class TLSContactSteps:
     def step6_enter_password(self):
         """Step 6: Enter password in the password input field"""
         logger.info("Step 6: Entering password...")
+
+        self.remove_url_bar_focus()
+        self.ensure_page_focus()
 
         password = os.getenv("TLS_PASSWORD", "Dilijan24$")
 
@@ -414,6 +572,7 @@ class TLSContactSteps:
         """Step 7: Click the final Login submit button"""
         logger.info("Step 7: Clicking Login submit button...")
 
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
         self.human_delay(1, 2)
 
@@ -450,9 +609,8 @@ class TLSContactSteps:
 
         self.human_delay(5, 8)
         self.wait_for_page_load(timeout=30)
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
-
-        self.take_screenshot("before_select_button.png")
 
         logger.info("🔄 Strategy 1: Trying alternative selectors...")
         alternative_selectors = [
@@ -547,6 +705,7 @@ class TLSContactSteps:
         logger.info("Step 10: Clicking Continue button...")
 
         self.human_delay(3, 5)
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
         continue_selectors = [
@@ -581,7 +740,6 @@ class TLSContactSteps:
 
                 logger.info("✅ Successfully opened Continue link in new tab")
                 self.wait_for_page_load()
-                self.take_screenshot("final_step_completed.png")
                 return True
 
             except Exception as e:
@@ -592,7 +750,6 @@ class TLSContactSteps:
             if self.safe_click(selector):
                 logger.info("✅ Successfully clicked Continue button (normal click)")
                 self.wait_for_page_load()
-                self.take_screenshot("final_step_completed.png")
                 return True
 
         continue_xpaths = [
@@ -606,7 +763,6 @@ class TLSContactSteps:
             if self.safe_click_by_xpath(xpath):
                 logger.info("✅ Successfully clicked Continue button (XPath)")
                 self.wait_for_page_load()
-                self.take_screenshot("final_step_completed.png")
                 return True
 
         logger.error("❌ Could not find Continue button")
@@ -618,8 +774,10 @@ class TLSContactSteps:
 
         self.human_delay(3, 5)
         self.wait_for_page_load()
+        self.remove_url_bar_focus()
         self.ensure_page_focus()
 
+        # Take only this screenshot and delete existing one
         self.take_screenshot("appointment_availability_check.png")
 
         no_slots_xpaths = [
