@@ -23,3 +23,11 @@ TestResults.xml
 # Python cache
 __pycache__/
 *.pyc
+# Environment variables
+.env
+
+# Screenshots
+*.png
+
+# Python cache
+.env
