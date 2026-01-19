@@ -70,7 +70,7 @@ def create_stable_driver():
         logger.info("Initializing Chrome driver...")
         driver = uc.Chrome(
             options=options,
-            version_main=141,
+            version_main=143,
             use_subprocess=True
         )
 
