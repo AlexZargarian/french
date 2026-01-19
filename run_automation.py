@@ -5,6 +5,7 @@ import certifi
 import time
 import logging
 import random
+import requests
 from datetime import datetime
 from tlscontact_steps import TLSContactSteps
 from selenium.common.exceptions import NoSuchWindowException, WebDriverException

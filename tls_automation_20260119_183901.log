@@ -1,0 +1,105 @@
+2026-01-19 18:39:01,855 - INFO - 🔄 Starting continuous TLSContact automation...
+2026-01-19 18:39:01,855 - INFO - 📝 Logs are being saved to: tls_automation_20260119_183901.log
+2026-01-19 18:39:01,855 - INFO - 
+============================================================
+2026-01-19 18:39:01,855 - INFO - 🔄 ATTEMPT #1 - Starting at 2026-01-19 18:39:01
+2026-01-19 18:39:01,855 - INFO - ============================================================
+2026-01-19 18:39:01,855 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-19 18:39:01,871 - INFO - Initializing Chrome driver...
+2026-01-19 18:39:02,913 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-19 18:39:05,931 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-19 18:39:07,935 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-19 18:39:08,391 - INFO - ✅ Page navigation successful
+2026-01-19 18:39:08,391 - INFO - ⏳ Waiting for Cloudflare (30 seconds)...
+2026-01-19 18:39:41,776 - INFO - 📄 Current URL: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-19 18:39:41,776 - INFO - 📄 Page title: Welcome to TLScontact Yerevan | TLScontact Yerevan
+2026-01-19 18:39:41,776 - INFO - 🎉 Continuing with automation steps...
+2026-01-19 18:39:45,586 - INFO - Starting automatic step execution...
+2026-01-19 18:39:45,586 - INFO - Starting TLSContact automation sequence...
+2026-01-19 18:39:45,587 - INFO - Step 1: Clicking 'Book an appointment' button...
+2026-01-19 18:39:53,625 - INFO - Successfully clicked 'Book an appointment'
+2026-01-19 18:39:58,782 - INFO - Step 2: Clicking 'Yes' for France-Visas question...
+2026-01-19 18:40:06,932 - INFO - Successfully clicked 'Yes' for France-Visas question
+2026-01-19 18:40:11,219 - INFO - Step 3: Clicking 'Yes' for TLScontact registration question...
+2026-01-19 18:40:17,985 - INFO - Successfully clicked second 'Yes' button
+2026-01-19 18:40:22,630 - INFO - Step 4: Clicking 'LOG IN' button...
+2026-01-19 18:40:31,323 - INFO - Successfully clicked 'LOG IN' button
+2026-01-19 18:40:35,704 - INFO - Step 5: Entering email address...
+2026-01-19 18:40:47,545 - INFO - Successfully entered email: Info@i-travel.net
+2026-01-19 18:40:47,546 - INFO - Step 6: Entering password...
+2026-01-19 18:40:54,328 - INFO - Successfully entered password
+2026-01-19 18:40:56,337 - INFO - 🛡️ Checking for CAPTCHA iframe...
+2026-01-19 18:40:56,371 - INFO - ➡️ Focus switched to CAPTCHA iframe.
+2026-01-19 18:40:57,967 - INFO - ✅ Clicked checkbox: recaptcha-anchor
+2026-01-19 18:41:00,973 - INFO - Step 7: Clicking Login submit button...
+2026-01-19 18:41:17,964 - WARNING - Could not click button#btn-login: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x00000001028a6068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x000000010289cd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x00000001022bdccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x000000010230f6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x000000010230f9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010235ff74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010235d33a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x0000000102301fb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x0000000102302c81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x0000000102863011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000102867460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010283e023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000102867ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x000000010282cf01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000102889a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000102889c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010289c91c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff806c06e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff806c02857 thread_start + 15
+
+2026-01-19 18:41:30,337 - WARNING - Could not click #btn-login: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x00000001028a6068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x000000010289cd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x00000001022bdccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x000000010230f6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x000000010230f9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010235ff74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010235d33a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x0000000102301fb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x0000000102302c81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x0000000102863011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000102867460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010283e023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000102867ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x000000010282cf01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000102889a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000102889c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010289c91c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff806c06e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff806c02857 thread_start + 15
+
+2026-01-19 18:41:52,988 - WARNING - Could not click button.bg-primary-500: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x00000001028a6068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x000000010289cd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x00000001022bdccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x000000010230f6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x000000010230f9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010235ff74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010235d33a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x0000000102301fb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x0000000102302c81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x0000000102863011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000102867460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010283e023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000102867ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x000000010282cf01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000102889a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000102889c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010289c91c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff806c06e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff806c02857 thread_start + 15
+
+2026-01-19 18:41:54,729 - INFO - 🔚 Browser closed.
+2026-01-19 18:41:54,730 - INFO - 
+🛑 Automation stopped by user
+2026-01-19 18:41:54,730 - INFO - 📊 Final Stats: 0 successes, 0 failures out of 1 total attempts
+2026-01-19 18:41:54,730 - INFO - ensuring close

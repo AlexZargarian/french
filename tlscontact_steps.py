@@ -3,6 +3,7 @@ import logging
 import random
 import os
 
+import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,6 +13,13 @@ from selenium.common.exceptions import TimeoutException
 
 logger = logging.getLogger(__name__)
 
+# Optional: load .env if python-dotenv is installed
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 
 class TLSContactSteps:
     def __init__(self, driver):
@@ -19,15 +27,63 @@ class TLSContactSteps:
         self.wait = WebDriverWait(driver, 15)
 
     # -----------------------------
+    # Telegram helpers
+    # -----------------------------
+
+    def telegram_send_message(self, text: str) -> bool:
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+        if not token or not chat_id:
+            logger.warning("Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
+            return False
+
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        try:
+            r = requests.post(url, data={"chat_id": chat_id, "text": text}, timeout=15)
+            if r.status_code != 200:
+                logger.warning(f"Telegram sendMessage failed: {r.status_code} {r.text}")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Telegram sendMessage error: {e}")
+            return False
+
+    def telegram_send_photo(self, photo_path: str, caption: str = "") -> bool:
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+        if not token or not chat_id:
+            logger.warning("Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
+            return False
+
+        if not os.path.exists(photo_path):
+            logger.warning(f"Screenshot not found: {photo_path}")
+            return False
+
+        url = f"https://api.telegram.org/bot{token}/sendPhoto"
+        try:
+            with open(photo_path, "rb") as f:
+                files = {"photo": f}
+                data = {"chat_id": chat_id, "caption": caption}
+                r = requests.post(url, data=data, files=files, timeout=30)
+
+            if r.status_code != 200:
+                logger.warning(f"Telegram sendPhoto failed: {r.status_code} {r.text}")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Telegram sendPhoto error: {e}")
+            return False
+
+    # -----------------------------
     # Utilities
     # -----------------------------
 
     def human_delay(self, min_sec=1, max_sec=3):
-        """Add human-like random delays"""
         time.sleep(random.uniform(min_sec, max_sec))
 
     def remove_url_bar_focus(self):
-        """Remove focus from URL bar to eliminate vertical bar in address bar"""
         try:
             self.driver.execute_script("""
                 if (document.body) {
@@ -50,7 +106,6 @@ class TLSContactSteps:
             return False
 
     def ensure_page_focus(self):
-        """Ensure focus is on the page, not the URL bar"""
         try:
             self.remove_url_bar_focus()
             self.driver.execute_script("""
@@ -72,7 +127,6 @@ class TLSContactSteps:
             return False
 
     def clear_email_field_focus(self, selector, by=By.CSS_SELECTOR):
-        """Clear any vertical bar/cursor from email field"""
         try:
             element = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((by, selector))
@@ -101,7 +155,6 @@ class TLSContactSteps:
             return False
 
     def safe_click(self, selector, by=By.CSS_SELECTOR, timeout=10):
-        """Safely click an element with waiting and retry"""
         try:
             self.remove_url_bar_focus()
             self.ensure_page_focus()
@@ -123,7 +176,6 @@ class TLSContactSteps:
             return False
 
     def safe_click_by_xpath(self, xpath, timeout=10):
-        """Safely click an element using XPath"""
         try:
             self.remove_url_bar_focus()
             self.ensure_page_focus()
@@ -145,7 +197,6 @@ class TLSContactSteps:
             return False
 
     def safe_type(self, selector, text, by=By.CSS_SELECTOR, timeout=10):
-        """Safely type text into an input field"""
         try:
             self.remove_url_bar_focus()
             self.ensure_page_focus()
@@ -183,7 +234,6 @@ class TLSContactSteps:
             return False
 
     def safe_type_email(self, selector, text, by=By.CSS_SELECTOR, timeout=10):
-        """Safely type email with extra blur/focus handling"""
         try:
             self.remove_url_bar_focus()
             self.ensure_page_focus()
@@ -226,7 +276,6 @@ class TLSContactSteps:
             return False
 
     def wait_for_page_load(self, timeout=30):
-        """Wait for page to fully load"""
         try:
             WebDriverWait(self.driver, timeout).until(
                 lambda driver: driver.execute_script("return document.readyState") == "complete"
@@ -240,7 +289,6 @@ class TLSContactSteps:
             return False
 
     def wait_for_url_contains(self, url_part, timeout=30):
-        """Wait until current URL contains specific text"""
         try:
             WebDriverWait(self.driver, timeout).until(EC.url_contains(url_part))
             logger.info(f"Successfully reached page containing: {url_part}")
@@ -251,7 +299,6 @@ class TLSContactSteps:
             return False
 
     def wait_until_app_domain(self, prefix="https://visas-fr.tlscontact.com/en-us/", timeout=60):
-        """Wait until we're redirected back to the TLS app domain after login."""
         try:
             def on_app_prefix(driver):
                 url = driver.current_url or ""
@@ -283,7 +330,6 @@ class TLSContactSteps:
             return False
 
     def take_screenshot(self, filename):
-        """Take screenshot of current state and delete existing one"""
         try:
             if os.path.exists(filename):
                 os.remove(filename)
@@ -295,12 +341,11 @@ class TLSContactSteps:
         logger.info(f"Screenshot saved: {filename}")
 
     def check_if_already_on_target_page(self):
-        """Check if we're already on the service level page"""
         current_url = self.driver.current_url
         return "workflow/service-level" in current_url or "/workflow" in current_url
 
     # -----------------------------
-    # Steps
+    # Steps (your existing flow)
     # -----------------------------
 
     def step1_click_book_appointment(self):
@@ -344,9 +389,7 @@ class TLSContactSteps:
                 self.wait_for_page_load()
                 return True
 
-        xpaths = [
-            "//button[@id='btn-yes']",
-        ]
+        xpaths = ["//button[@id='btn-yes']"]
         for xpath in xpaths:
             if self.safe_click_by_xpath(xpath):
                 logger.info("Successfully clicked 'Yes' for France-Visas question (XPath)")
@@ -367,19 +410,14 @@ class TLSContactSteps:
             if len(elements) >= 2:
                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[1])
                 self.human_delay(0.3, 0.6)
-
-                actions = ActionChains(self.driver)
-                actions.move_to_element(elements[1]).pause(0.3).click().perform()
-
+                ActionChains(self.driver).move_to_element(elements[1]).pause(0.3).click().perform()
                 logger.info("Successfully clicked second 'Yes' button")
                 self.wait_for_page_load()
                 return True
         except Exception:
             pass
 
-        xpaths = [
-            "(//button[@id='btn-yes'])[2]",
-        ]
+        xpaths = ["(//button[@id='btn-yes'])[2]"]
         for xpath in xpaths:
             if self.safe_click_by_xpath(xpath):
                 logger.info("Successfully clicked 'Yes' for TLScontact question (XPath)")
@@ -402,10 +440,7 @@ class TLSContactSteps:
                 self.wait_for_page_load()
                 return True
 
-        xpaths = [
-            "//span[@id='btn-select-country']",
-            "//span[contains(., 'LOG IN')]",
-        ]
+        xpaths = ["//span[@id='btn-select-country']", "//span[contains(., 'LOG IN')]"]
         for xpath in xpaths:
             if self.safe_click_by_xpath(xpath):
                 logger.info("Successfully clicked 'LOG IN' button (XPath)")
@@ -421,7 +456,7 @@ class TLSContactSteps:
         self.remove_url_bar_focus()
         self.ensure_page_focus()
 
-        email = os.getenv("TLS_EMAIL", "Info@i-travel.net")
+        email = os.getenv("TLS_EMAIL", "")
 
         selectors = [
             "input#email-input-field",
@@ -440,10 +475,7 @@ class TLSContactSteps:
             except Exception as e:
                 logger.warning(f"Email selector {selector} failed: {e}")
 
-        xpaths = [
-            "//input[@id='email-input-field']",
-            "//input[@name='username']",
-        ]
+        xpaths = ["//input[@id='email-input-field']", "//input[@name='username']"]
         for xpath in xpaths:
             if self.safe_type_email(xpath, email, By.XPATH):
                 logger.info(f"Successfully entered email (XPath): {email}")
@@ -457,7 +489,7 @@ class TLSContactSteps:
         self.remove_url_bar_focus()
         self.ensure_page_focus()
 
-        password = os.getenv("TLS_PASSWORD", "Zar4ka055?")
+        password = os.getenv("TLS_PASSWORD", "")
 
         selectors = [
             "input#password-input-field",
@@ -471,11 +503,7 @@ class TLSContactSteps:
                 logger.info("Successfully entered password")
                 return True
 
-        xpaths = [
-            "//input[@id='password-input-field']",
-            "//input[@name='password']",
-            "//input[@type='password']"
-        ]
+        xpaths = ["//input[@id='password-input-field']", "//input[@name='password']", "//input[@type='password']"]
         for xpath in xpaths:
             if self.safe_type(xpath, password, By.XPATH):
                 logger.info("Successfully entered password (XPath)")
@@ -485,8 +513,11 @@ class TLSContactSteps:
         return False
 
     def handle_captcha_challenge(self, timeout=12):
-        """Detects and clicks the 'I am not a robot' checkbox inside its iframe."""
-        logger.info("🛡️ Checking for 'I am not a robot' checkbox...")
+        """
+        Detects a CAPTCHA iframe and attempts to interact with it.
+        Note: Many CAPTCHAs are designed to block automation.
+        """
+        logger.info("🛡️ Checking for CAPTCHA iframe...")
         try:
             iframe_xpath = (
                 "//iframe[contains(@title, 'challenge') "
@@ -501,11 +532,10 @@ class TLSContactSteps:
             self.driver.switch_to.frame(captcha_iframe)
             logger.info("➡️ Focus switched to CAPTCHA iframe.")
 
+            # If your site sometimes uses a simple checkbox, this tries to click it.
             checkbox_selectors = [
-                (By.ID, "recaptcha-anchor"),          # Google reCAPTCHA
-                (By.CSS_SELECTOR, ".mark"),           # Cloudflare Turnstile
+                (By.ID, "recaptcha-anchor"),
                 (By.CSS_SELECTOR, "input[type='checkbox']"),
-                (By.CLASS_NAME, "ctp-checkbox-label"),
             ]
 
             clicked = False
@@ -514,26 +544,23 @@ class TLSContactSteps:
                     checkbox = self.driver.find_element(by, sel)
                     if checkbox.is_displayed() and checkbox.is_enabled():
                         self.human_delay(0.6, 1.4)
-
-                        actions = ActionChains(self.driver)
-                        actions.move_to_element(checkbox).pause(
+                        ActionChains(self.driver).move_to_element(checkbox).pause(
                             random.uniform(0.2, 0.5)
                         ).click().perform()
-
-                        logger.info(f"✅ Clicked checkbox locator (ActionChains): {sel}")
+                        logger.info(f"✅ Clicked checkbox: {sel}")
                         clicked = True
                         break
                 except Exception:
                     continue
 
             if clicked:
-                time.sleep(5)
+                time.sleep(3)
 
             self.driver.switch_to.default_content()
             return clicked
 
         except TimeoutException:
-            logger.info("ℹ️ No checkbox detected within timeout.")
+            logger.info("ℹ️ No CAPTCHA iframe detected within timeout.")
             self.driver.switch_to.default_content()
             return False
         except Exception as e:
@@ -542,7 +569,6 @@ class TLSContactSteps:
             return False
 
     def step7_click_login_submit(self):
-        """Final submit on the auth page (pressed AFTER CAPTCHA)."""
         logger.info("Step 7: Clicking Login submit button...")
         self.remove_url_bar_focus()
         self.ensure_page_focus()
@@ -555,11 +581,7 @@ class TLSContactSteps:
                 self.wait_for_page_load()
                 return True
 
-        xpaths = [
-            "//button[@id='btn-login']",
-            "//button[normalize-space()='Login']",
-            "//button[contains(., 'Login')]"
-        ]
+        xpaths = ["//button[@id='btn-login']", "//button[normalize-space()='Login']", "//button[contains(., 'Login')]"]
         for xpath in xpaths:
             if self.safe_click_by_xpath(xpath):
                 logger.info("Successfully clicked Login submit button (XPath)")
@@ -570,10 +592,6 @@ class TLSContactSteps:
         return False
 
     def step8_click_select_button(self):
-        """
-        Step 8: Click the Select button on travel-groups page.
-        FIX: do NOT hardcode value='23012573' because it changes (you saw 24313450).
-        """
         logger.info("Step 8: Clicking Select button (dynamic formGroupId)...")
 
         self.human_delay(2, 4)
@@ -581,7 +599,6 @@ class TLSContactSteps:
         self.remove_url_bar_focus()
         self.ensure_page_focus()
 
-        # Wait until at least one submit button for formGroupId exists
         try:
             buttons = WebDriverWait(self.driver, 25).until(
                 EC.presence_of_all_elements_located(
@@ -592,7 +609,6 @@ class TLSContactSteps:
             logger.error("No Select buttons found (button[name='formGroupId'][type='submit']).")
             return False
 
-        # Prefer visible button with text "Select"
         target = None
         for b in buttons:
             try:
@@ -602,7 +618,6 @@ class TLSContactSteps:
             except Exception:
                 continue
 
-        # Fallback: first visible
         if target is None:
             for b in buttons:
                 try:
@@ -616,21 +631,16 @@ class TLSContactSteps:
             logger.error("Found formGroupId submit buttons, but none are visible.")
             return False
 
-        # Try ActionChains click first
         try:
             self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", target)
             self.human_delay(0.5, 1.2)
-
-            actions = ActionChains(self.driver)
-            actions.move_to_element(target).pause(random.uniform(0.2, 0.5)).click().perform()
-
+            ActionChains(self.driver).move_to_element(target).pause(random.uniform(0.2, 0.5)).click().perform()
             logger.info(f"✅ Clicked Select. formGroupId value={target.get_attribute('value')}")
             self.human_delay(2, 4)
             return True
         except Exception as e:
             logger.warning(f"ActionChains click failed: {e}")
 
-        # Fallback: JS click
         try:
             self.driver.execute_script("arguments[0].click();", target)
             logger.info(f"✅ Clicked Select via JS. formGroupId value={target.get_attribute('value')}")
@@ -670,37 +680,8 @@ class TLSContactSteps:
         ]
 
         for selector in continue_selectors:
-            try:
-                element = WebDriverWait(self.driver, 10).until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
-                )
-
-                original_window = self.driver.current_window_handle
-
-                actions = ActionChains(self.driver)
-                actions.key_down(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
-                actions.click(element)
-                actions.key_up(Keys.COMMAND if os.name == 'posix' else Keys.CONTROL)
-                actions.perform()
-
-                self.human_delay(2, 3)
-                WebDriverWait(self.driver, 10).until(EC.number_of_windows_to_be(2))
-
-                for window_handle in self.driver.window_handles:
-                    if window_handle != original_window:
-                        self.driver.switch_to.window(window_handle)
-                        break
-
-                logger.info("Successfully opened Continue link in new tab")
-                self.wait_for_page_load()
-                return True
-
-            except Exception as e:
-                logger.warning(f"Could not open in new tab: {e}")
-
-        for selector in continue_selectors:
             if self.safe_click(selector):
-                logger.info("Successfully clicked Continue button (normal click)")
+                logger.info("Successfully clicked Continue button")
                 self.wait_for_page_load()
                 return True
 
@@ -726,7 +707,8 @@ class TLSContactSteps:
         self.remove_url_bar_focus()
         self.ensure_page_focus()
 
-        self.take_screenshot("appointment_availability_check.png")
+        screenshot_path = "appointment_availability_check.png"
+        self.take_screenshot(screenshot_path)
 
         no_slots_xpaths = [
             "//p[contains(@class, 'mb-2') and contains(@class, 'text-center') and contains(text(), 'appointment slots available')]",
@@ -744,16 +726,16 @@ class TLSContactSteps:
             except Exception:
                 continue
 
+        # ✅ SUCCESS: send Telegram ONLY here
         logger.info("Appointment slots appear to be available")
         print("Yes time")
+
+        self.telegram_send_message("✅ TLS: Slot might be available! Screenshot attached.")
+        self.telegram_send_photo(screenshot_path, caption="TLS appointment availability")
+
         return True
 
-    # -----------------------------
-    # Master sequence
-    # -----------------------------
-
     def execute_all_steps(self):
-        """Execute all steps in sequence."""
         logger.info("Starting TLSContact automation sequence...")
 
         if not self.step1_click_book_appointment():
@@ -769,7 +751,6 @@ class TLSContactSteps:
         if not self.step6_enter_password():
             return False
 
-        # CAPTCHA first (if it appears), then Login submit
         time.sleep(2)
         self.handle_captcha_challenge()
 
