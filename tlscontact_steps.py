@@ -722,16 +722,20 @@ class TLSContactSteps:
                 if no_slots_element.is_displayed():
                     logger.info("No appointment slots available message detected")
                     print("No time")
+                    # Send ONLY to Telegram channel
+                    self.telegram_send_message("❌ No time")
+                    self.telegram_send_photo(screenshot_path, caption="No time - Screenshot")
                     return True
             except Exception:
                 continue
 
-        # ✅ SUCCESS: send Telegram ONLY here
+        # If no "no slots" message found
         logger.info("Appointment slots appear to be available")
         print("Yes time")
 
-        self.telegram_send_message("✅ TLS: Slot might be available! Screenshot attached.")
-        self.telegram_send_photo(screenshot_path, caption="TLS appointment availability")
+        # Send ONLY to Telegram channel
+        self.telegram_send_message("✅ Yes time")
+        self.telegram_send_photo(screenshot_path, caption="Yes time - Screenshot")
 
         return True
 

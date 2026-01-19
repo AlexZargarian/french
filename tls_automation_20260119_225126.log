@@ -1,0 +1,131 @@
+2026-01-19 22:51:26,789 - INFO - 🔄 Starting continuous TLSContact automation...
+2026-01-19 22:51:26,789 - INFO - 📝 Logs are being saved to: tls_automation_20260119_225126.log
+2026-01-19 22:51:26,789 - INFO - 
+============================================================
+2026-01-19 22:51:26,789 - INFO - 🔄 ATTEMPT #1 - Starting at 2026-01-19 22:51:26
+2026-01-19 22:51:26,789 - INFO - ============================================================
+2026-01-19 22:51:26,789 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-19 22:51:26,806 - INFO - Initializing Chrome driver...
+2026-01-19 22:51:29,819 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-19 22:51:32,837 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-19 22:51:34,839 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-19 22:51:35,601 - INFO - ✅ Page navigation successful
+2026-01-19 22:51:35,601 - INFO - ⏳ Waiting for Cloudflare (30 seconds)...
+2026-01-19 22:52:08,118 - INFO - 📄 Current URL: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-19 22:52:08,118 - INFO - 📄 Page title: Welcome to TLScontact Yerevan | TLScontact Yerevan
+2026-01-19 22:52:08,118 - INFO - 🎉 Continuing with automation steps...
+2026-01-19 22:52:08,123 - INFO - Starting automatic step execution...
+2026-01-19 22:52:08,123 - INFO - Starting automation sequence...
+2026-01-19 22:52:08,123 - INFO - Step 1: Click 'Book an appointment'
+2026-01-19 22:52:09,586 - INFO - Step 2: Click 'Yes' (France-Visas)
+2026-01-19 22:52:11,677 - INFO - Step 3: Click second 'Yes' (TLScontact)
+2026-01-19 22:52:13,342 - INFO - Step 4: Click 'LOG IN'
+2026-01-19 22:52:17,366 - INFO - Step 5: Type email
+2026-01-19 22:52:19,949 - INFO - Step 6: Type password
+2026-01-19 22:52:22,224 - INFO - 🛡️ Checking for CAPTCHA iframe...
+2026-01-19 22:52:22,257 - INFO - ➡️ Switched into CAPTCHA iframe.
+2026-01-19 22:52:24,018 - INFO - ✅ Clicked CAPTCHA checkbox using: recaptcha-anchor
+2026-01-19 22:52:27,959 - INFO - CAPTCHA checkbox clicked automatically.
+2026-01-19 22:52:27,959 - INFO - Step 7: Submit login
+2026-01-19 22:52:32,146 - INFO - Step 10: Click Continue
+2026-01-19 22:52:52,714 - WARNING - Could not click #book-appointment-btn: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x0000000104882068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000104878d1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x0000000104299ccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001042eb6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x00000001042eb9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010433bf74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010433933a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x00000001042ddfb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x00000001042dec81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x000000010483f011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000104843460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010481a023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000104843ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x0000000104808f01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000104865a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000104865c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010487891c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff815406e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff815402857 thread_start + 15
+
+2026-01-19 22:53:13,300 - WARNING - Could not click a#book-appointment-btn: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x0000000104882068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000104878d1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x0000000104299ccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001042eb6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x00000001042eb9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010433bf74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010433933a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x00000001042ddfb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x00000001042dec81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x000000010483f011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000104843460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010481a023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000104843ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x0000000104808f01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000104865a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000104865c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010487891c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff815406e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff815402857 thread_start + 15
+
+2026-01-19 22:53:33,923 - WARNING - Could not click XPath //a[@id='book-appointment-btn']: Message: 
+Stacktrace:
+0   undetected_chromedriver             0x0000000104882068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000104878d1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x0000000104299ccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001042eb6b0 undetected_chromedriver + 771760
+4   undetected_chromedriver             0x00000001042eb9c1 undetected_chromedriver + 772545
+5   undetected_chromedriver             0x000000010433bf74 undetected_chromedriver + 1101684
+6   undetected_chromedriver             0x000000010433933a undetected_chromedriver + 1090362
+7   undetected_chromedriver             0x00000001042ddfb7 undetected_chromedriver + 716727
+8   undetected_chromedriver             0x00000001042dec81 undetected_chromedriver + 720001
+9   undetected_chromedriver             0x000000010483f011 undetected_chromedriver + 6357009
+10  undetected_chromedriver             0x0000000104843460 undetected_chromedriver + 6374496
+11  undetected_chromedriver             0x000000010481a023 undetected_chromedriver + 6205475
+12  undetected_chromedriver             0x0000000104843ed5 undetected_chromedriver + 6377173
+13  undetected_chromedriver             0x0000000104808f01 undetected_chromedriver + 6135553
+14  undetected_chromedriver             0x0000000104865a98 undetected_chromedriver + 6515352
+15  undetected_chromedriver             0x0000000104865c53 undetected_chromedriver + 6515795
+16  undetected_chromedriver             0x000000010487891c undetected_chromedriver + 6592796
+17  libsystem_pthread.dylib             0x00007ff815406e4d _pthread_start + 115
+18  libsystem_pthread.dylib             0x00007ff815402857 thread_start + 15
+
+2026-01-19 22:53:33,923 - WARNING - Continue button not found; continuing anyway to availability check...
+2026-01-19 22:53:33,923 - INFO - Step 11: Check appointment availability (always send Telegram)
+2026-01-19 22:53:35,592 - INFO - Screenshot saved: appointment_availability_check.png
+2026-01-19 22:53:45,635 - INFO - No slots detected
+2026-01-19 22:53:47,190 - INFO - 🎉 Automation sequence completed.
+2026-01-19 22:53:47,190 - INFO - 🎉 All automation steps completed successfully!
+2026-01-19 22:53:47,460 - INFO - 🔚 Browser closed.
+2026-01-19 22:53:47,460 - INFO - ✅ Attempt #1 completed successfully!
+2026-01-19 22:53:47,460 - INFO - 📊 Stats: 1 successes, 0 failures out of 1 total attempts
+2026-01-19 22:53:47,460 - INFO - 🔄 Restarting immediately for next attempt...
+2026-01-19 22:53:47,460 - INFO - 
+============================================================
+2026-01-19 22:53:47,460 - INFO - 🔄 ATTEMPT #2 - Starting at 2026-01-19 22:53:47
+2026-01-19 22:53:47,460 - INFO - ============================================================
+2026-01-19 22:53:47,460 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-19 22:53:47,460 - INFO - Initializing Chrome driver...
+2026-01-19 22:53:51,773 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-19 22:53:54,761 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-19 22:53:56,764 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-19 22:53:56,768 - INFO - ✅ Page navigation successful
+2026-01-19 22:53:56,768 - INFO - ⏳ Waiting for Cloudflare (30 seconds)...
+2026-01-19 22:53:56,770 - WARNING - ⚠️ Window died during CF wait; recreating driver…
+2026-01-19 22:53:56,770 - INFO - Initializing Chrome driver...
+2026-01-19 22:54:00,193 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-19 22:54:02,687 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-19 22:54:03,930 - WARNING - ⚠️ Window died during CF wait; recreating driver…
+2026-01-19 22:54:03,931 - INFO - Initializing Chrome driver...
+2026-01-19 22:54:05,945 - INFO - 🔚 Browser closed.
+2026-01-19 22:54:05,945 - INFO - 
+🛑 Automation stopped by user
+2026-01-19 22:54:05,945 - INFO - 📊 Final Stats: 1 successes, 0 failures out of 2 total attempts
+2026-01-19 22:54:05,945 - INFO - ensuring close
+2026-01-19 22:54:05,945 - INFO - ensuring close
+2026-01-19 22:54:05,945 - INFO - ensuring close
+2026-01-19 22:54:05,945 - INFO - ensuring close
