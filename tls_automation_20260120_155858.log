@@ -1,0 +1,335 @@
+2026-01-20 15:58:58,960 - INFO - 🔄 Starting continuous TLSContact automation...
+2026-01-20 15:58:58,960 - INFO - 📝 Logs are being saved to: tls_automation_20260120_155858.log
+2026-01-20 15:58:58,960 - INFO - 
+============================================================
+2026-01-20 15:58:58,960 - INFO - 🔄 ATTEMPT #1 - Starting at 2026-01-20 15:58:58
+2026-01-20 15:58:58,960 - INFO - ============================================================
+2026-01-20 15:58:58,960 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-20 15:58:58,973 - INFO - Initializing Chrome driver...
+2026-01-20 15:59:00,043 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-20 15:59:03,643 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-20 15:59:05,648 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-20 15:59:05,653 - ERROR - ❌ Navigation failed: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000104896068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x000000010488cd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x00000001042adccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001042825f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x000000010432d918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x000000010434cd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x00000001042f1fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x00000001042f2c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000104853011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000104857460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x000000010482e023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000104857ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x000000010481cf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000104879a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000104879c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x000000010488c91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 15:59:05,654 - ERROR - ❌ Both navigation attempts failed: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000104896068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x000000010488cd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x00000001042adccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001042825f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x000000010432d918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x000000010434cd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x00000001042f1fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x00000001042f2c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000104853011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000104857460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x000000010482e023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000104857ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x000000010481cf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000104879a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000104879c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x000000010488c91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 15:59:05,863 - INFO - 🔚 Browser closed.
+2026-01-20 15:59:05,863 - ERROR - ❌ Attempt #1 failed!
+2026-01-20 15:59:05,863 - INFO - 📊 Stats: 0 successes, 1 failures out of 1 total attempts
+2026-01-20 15:59:05,863 - INFO - 🔄 Restarting immediately after failure...
+2026-01-20 15:59:05,863 - INFO - 
+============================================================
+2026-01-20 15:59:05,864 - INFO - 🔄 ATTEMPT #2 - Starting at 2026-01-20 15:59:05
+2026-01-20 15:59:05,864 - INFO - ============================================================
+2026-01-20 15:59:05,864 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-20 15:59:05,864 - INFO - Initializing Chrome driver...
+2026-01-20 15:59:07,060 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-20 15:59:09,536 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-20 15:59:11,540 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-20 15:59:11,924 - INFO - ✅ Page navigation successful
+2026-01-20 15:59:11,924 - INFO - ⏳ Waiting for Cloudflare (30 seconds)...
+2026-01-20 15:59:43,359 - INFO - 📄 Current URL: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-20 15:59:43,360 - INFO - 📄 Page title: Welcome to TLScontact Yerevan | TLScontact Yerevan
+2026-01-20 15:59:43,360 - INFO - 🎉 Continuing with automation steps...
+2026-01-20 15:59:43,360 - INFO - Loaded failure count: 0
+2026-01-20 15:59:48,336 - INFO - Starting automatic step execution...
+2026-01-20 15:59:48,337 - INFO - Starting TLSContact automation sequence...
+2026-01-20 15:59:48,338 - INFO - Current consecutive failures: 0
+2026-01-20 15:59:48,338 - INFO - Step 1: Clicking 'Book an appointment' button...
+2026-01-20 15:59:55,614 - INFO - Successfully clicked 'Book an appointment'
+2026-01-20 15:59:59,477 - INFO - Step 2: Clicking 'Yes' for France-Visas question...
+2026-01-20 16:00:08,882 - INFO - Successfully clicked 'Yes' for France-Visas question
+2026-01-20 16:00:13,609 - INFO - Step 3: Clicking 'Yes' for TLScontact registration question...
+2026-01-20 16:00:19,794 - INFO - Successfully clicked second 'Yes' button
+2026-01-20 16:00:23,670 - INFO - Step 4: Clicking 'LOG IN' button...
+2026-01-20 16:00:31,492 - INFO - Successfully clicked 'LOG IN' button
+2026-01-20 16:00:40,108 - INFO - 🎭 Simulating natural human behavior on login page...
+2026-01-20 16:00:40,108 - INFO - 🎭 Simulating human pre-login behavior...
+2026-01-20 16:01:30,784 - INFO - ✅ Completed human pre-login simulation
+2026-01-20 16:01:30,784 - INFO - 🔐 Entering credentials with human-like patterns...
+2026-01-20 16:01:30,784 - INFO - 🔐 Entering credentials with human-like patterns...
+2026-01-20 16:01:44,700 - INFO - ✅ Credentials entered with human-like patterns
+2026-01-20 16:01:44,700 - INFO - ⏳ Natural pause before CAPTCHA...
+2026-01-20 16:01:47,778 - INFO - 🛡️ Checking for CAPTCHA (subtle approach)...
+2026-01-20 16:01:50,274 - INFO - Found CAPTCHA iframe: iframe[src*='recaptcha']
+2026-01-20 16:01:54,264 - INFO - ✅ Subtly clicked CAPTCHA checkbox
+2026-01-20 16:01:58,533 - INFO - Step 7: Clicking Login submit button...
+2026-01-20 16:02:06,753 - INFO - Successfully clicked Login submit button
+2026-01-20 16:02:11,806 - INFO - Returned to app domain. URL: https://visas-fr.tlscontact.com/en-us/travel-groups
+2026-01-20 16:02:11,815 - INFO - Post-login page marker detected (list/workflow link).
+2026-01-20 16:02:15,547 - INFO - Step 8: Clicking Select button (dynamic formGroupId)...
+2026-01-20 16:02:25,904 - INFO - ✅ Clicked Select. formGroupId value=24313450
+2026-01-20 16:02:28,093 - INFO - Step 9: Waiting for service level page to load...
+2026-01-20 16:02:28,101 - INFO - Successfully reached page containing: workflow/service-level
+2026-01-20 16:02:33,120 - INFO - Successfully reached service level page (matched: workflow/service-level)
+2026-01-20 16:02:33,120 - INFO - Step 10: Clicking Continue button...
+2026-01-20 16:02:43,435 - INFO - Successfully clicked Continue button
+2026-01-20 16:02:48,119 - INFO - === Checking CURRENT month ===
+2026-01-20 16:02:48,120 - INFO - Step 11: Checking current month appointment availability...
+2026-01-20 16:02:57,777 - INFO - Screenshot saved: appointment_current_20260120_160257.png
+2026-01-20 16:02:57,819 - INFO - No appointment slots available in current month
+2026-01-20 16:02:59,024 - INFO - === Checking NEXT month ===
+2026-01-20 16:02:59,024 - INFO - Step 12: Looking for next month button...
+2026-01-20 16:03:03,506 - INFO - Found next month button: February 2026
+2026-01-20 16:03:05,112 - INFO - ✅ Automatically clicked: February 2026
+2026-01-20 16:03:15,153 - INFO - Step 11: Checking next month appointment availability...
+2026-01-20 16:03:26,156 - INFO - Screenshot saved: appointment_next_20260120_160325.png
+2026-01-20 16:03:26,164 - INFO - No appointment slots available in next month
+2026-01-20 16:03:27,341 - INFO - 🎉 All automation steps completed successfully!
+2026-01-20 16:03:27,341 - INFO - 🎉 All automation steps completed successfully!
+2026-01-20 16:03:27,559 - INFO - 🔚 Browser closed.
+2026-01-20 16:03:27,559 - INFO - ✅ Attempt #2 completed successfully!
+2026-01-20 16:03:27,559 - INFO - 📊 Stats: 1 successes, 1 failures out of 2 total attempts
+2026-01-20 16:03:27,559 - INFO - 🔄 Restarting immediately for next attempt...
+2026-01-20 16:03:27,559 - INFO - 
+============================================================
+2026-01-20 16:03:27,559 - INFO - 🔄 ATTEMPT #3 - Starting at 2026-01-20 16:03:27
+2026-01-20 16:03:27,560 - INFO - ============================================================
+2026-01-20 16:03:27,560 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-20 16:03:27,560 - INFO - Initializing Chrome driver...
+2026-01-20 16:03:28,632 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-20 16:03:31,667 - INFO - ✅ Chrome driver initialized successfully!
+2026-01-20 16:03:33,673 - INFO - 🌐 Navigating to: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-20 16:03:34,141 - INFO - ✅ Page navigation successful
+2026-01-20 16:03:34,141 - INFO - ⏳ Waiting for Cloudflare (30 seconds)...
+2026-01-20 16:04:06,501 - INFO - 📄 Current URL: https://visas-fr.tlscontact.com/en-us/country/am/vac/amEVN2fr
+2026-01-20 16:04:06,501 - INFO - 📄 Page title: Welcome to TLScontact Yerevan | TLScontact Yerevan
+2026-01-20 16:04:06,501 - INFO - 🎉 Continuing with automation steps...
+2026-01-20 16:04:06,502 - INFO - Loaded failure count: 0
+2026-01-20 16:04:11,475 - INFO - Starting automatic step execution...
+2026-01-20 16:04:11,476 - INFO - Starting TLSContact automation sequence...
+2026-01-20 16:04:11,476 - INFO - Current consecutive failures: 0
+2026-01-20 16:04:11,476 - INFO - Step 1: Clicking 'Book an appointment' button...
+2026-01-20 16:04:19,370 - INFO - Successfully clicked 'Book an appointment'
+2026-01-20 16:04:22,991 - INFO - Step 2: Clicking 'Yes' for France-Visas question...
+2026-01-20 16:04:31,650 - INFO - Successfully clicked 'Yes' for France-Visas question
+2026-01-20 16:04:36,161 - INFO - Step 3: Clicking 'Yes' for TLScontact registration question...
+2026-01-20 16:04:42,198 - INFO - Successfully clicked second 'Yes' button
+2026-01-20 16:04:46,853 - INFO - Step 4: Clicking 'LOG IN' button...
+2026-01-20 16:04:57,034 - INFO - Successfully clicked 'LOG IN' button
+2026-01-20 16:05:06,290 - INFO - 🎭 Simulating natural human behavior on login page...
+2026-01-20 16:05:06,291 - INFO - 🎭 Simulating human pre-login behavior...
+2026-01-20 16:06:01,586 - INFO - ✅ Completed human pre-login simulation
+2026-01-20 16:06:01,587 - INFO - 🔐 Entering credentials with human-like patterns...
+2026-01-20 16:06:01,587 - INFO - 🔐 Entering credentials with human-like patterns...
+2026-01-20 16:06:16,157 - INFO - ✅ Credentials entered with human-like patterns
+2026-01-20 16:06:16,158 - INFO - ⏳ Natural pause before CAPTCHA...
+2026-01-20 16:06:18,674 - INFO - 🛡️ Checking for CAPTCHA (subtle approach)...
+2026-01-20 16:06:21,419 - INFO - Found CAPTCHA iframe: iframe[src*='recaptcha']
+2026-01-20 16:06:24,783 - INFO - ✅ Subtly clicked CAPTCHA checkbox
+2026-01-20 16:06:28,548 - INFO - Step 7: Clicking Login submit button...
+2026-01-20 16:06:36,222 - INFO - Successfully clicked Login submit button
+2026-01-20 16:06:41,058 - INFO - Returned to app domain. URL: https://visas-fr.tlscontact.com/en-us/travel-groups
+2026-01-20 16:06:41,064 - INFO - Post-login page marker detected (list/workflow link).
+2026-01-20 16:06:44,476 - INFO - Step 8: Clicking Select button (dynamic formGroupId)...
+2026-01-20 16:06:55,863 - INFO - ✅ Clicked Select. formGroupId value=24313450
+2026-01-20 16:06:58,653 - INFO - Step 9: Waiting for service level page to load...
+2026-01-20 16:06:58,668 - INFO - Successfully reached page containing: workflow/service-level
+2026-01-20 16:07:03,015 - INFO - Successfully reached service level page (matched: workflow/service-level)
+2026-01-20 16:07:03,015 - INFO - Step 10: Clicking Continue button...
+2026-01-20 16:07:13,939 - INFO - Successfully clicked Continue button
+2026-01-20 16:07:17,814 - INFO - === Checking CURRENT month ===
+2026-01-20 16:07:17,815 - INFO - Step 11: Checking current month appointment availability...
+2026-01-20 16:07:28,973 - INFO - Screenshot saved: appointment_current_20260120_160728.png
+2026-01-20 16:07:28,986 - INFO - No appointment slots available in current month
+2026-01-20 16:07:30,159 - INFO - === Checking NEXT month ===
+2026-01-20 16:07:30,159 - INFO - Step 12: Looking for next month button...
+2026-01-20 16:07:33,941 - WARNING - Could not remove URL bar focus: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000102f15068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102f0bd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010292cccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001029015f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x00000001029ac918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x00000001029cbd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x0000000102970fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x0000000102971c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000102ed2011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000102ed6460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x0000000102ead023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000102ed6ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x0000000102e9bf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000102ef8a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000102ef8c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x0000000102f0b91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 16:07:33,942 - WARNING - Could not remove URL bar focus: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000102f15068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102f0bd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010292cccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001029015f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x00000001029ac918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x00000001029cbd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x0000000102970fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x0000000102971c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000102ed2011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000102ed6460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x0000000102ead023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000102ed6ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x0000000102e9bf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000102ef8a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000102ef8c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x0000000102f0b91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 16:07:33,943 - WARNING - Could not ensure page focus: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000102f15068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102f0bd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010292cccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001029015f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x00000001029ac918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x00000001029cbd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x0000000102970fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x0000000102971c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000102ed2011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000102ed6460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x0000000102ead023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000102ed6ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x0000000102e9bf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000102ef8a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000102ef8c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x0000000102f0b91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 16:07:33,943 - ERROR - Unexpected error in execute_all_steps: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000102f15068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102f0bd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010292cccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001029015f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x00000001029ac918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x00000001029cbd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x0000000102970fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x0000000102971c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000102ed2011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000102ed6460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x0000000102ead023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000102ed6ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x0000000102e9bf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000102ef8a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000102ef8c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x0000000102f0b91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 16:07:33,947 - ERROR - Traceback: Traceback (most recent call last):
+  File "/Users/alex/Desktop/french appointment/french/tlscontact_steps.py", line 1726, in execute_all_steps
+    if self.step12_click_next_month():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alex/Desktop/french appointment/french/tlscontact_steps.py", line 1568, in step12_click_next_month
+    next_month_button = WebDriverWait(self.driver, 10).until(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alex/IdeaProjects/A-new-project/french appointment/lib/python3.11/site-packages/selenium/webdriver/support/wait.py", line 112, in until
+    value = method(self._driver)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alex/IdeaProjects/A-new-project/french appointment/lib/python3.11/site-packages/selenium/webdriver/support/expected_conditions.py", line 514, in _predicate
+    target = driver.find_element(*target)  # grab element at locator
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alex/IdeaProjects/A-new-project/french appointment/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 802, in find_element
+    return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alex/IdeaProjects/A-new-project/french appointment/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 432, in execute
+    self.error_handler.check_response(response)
+  File "/Users/alex/IdeaProjects/A-new-project/french appointment/lib/python3.11/site-packages/selenium/webdriver/remote/errorhandler.py", line 232, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=143.0.7499.193)
+Stacktrace:
+0   undetected_chromedriver             0x0000000102f15068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102f0bd1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010292cccb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001029015f0 undetected_chromedriver + 259568
+4   undetected_chromedriver             0x00000001029ac918 undetected_chromedriver + 960792
+5   undetected_chromedriver             0x00000001029cbd48 undetected_chromedriver + 1088840
+6   undetected_chromedriver             0x0000000102970fb7 undetected_chromedriver + 716727
+7   undetected_chromedriver             0x0000000102971c81 undetected_chromedriver + 720001
+8   undetected_chromedriver             0x0000000102ed2011 undetected_chromedriver + 6357009
+9   undetected_chromedriver             0x0000000102ed6460 undetected_chromedriver + 6374496
+10  undetected_chromedriver             0x0000000102ead023 undetected_chromedriver + 6205475
+11  undetected_chromedriver             0x0000000102ed6ed5 undetected_chromedriver + 6377173
+12  undetected_chromedriver             0x0000000102e9bf01 undetected_chromedriver + 6135553
+13  undetected_chromedriver             0x0000000102ef8a98 undetected_chromedriver + 6515352
+14  undetected_chromedriver             0x0000000102ef8c53 undetected_chromedriver + 6515795
+15  undetected_chromedriver             0x0000000102f0b91c undetected_chromedriver + 6592796
+16  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+17  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+
+2026-01-20 16:07:33,947 - WARNING - ❌ Failure #1 recorded
+2026-01-20 16:07:33,947 - WARNING - Failed at step: Unexpected error: Message: no such window: target window already clo
+2026-01-20 16:07:33,948 - ERROR - ❌ Some steps failed - check the logs and screenshots
+2026-01-20 16:07:34,147 - INFO - 🔚 Browser closed.
+2026-01-20 16:07:34,147 - ERROR - ❌ Attempt #3 failed!
+2026-01-20 16:07:34,147 - INFO - 📊 Stats: 1 successes, 2 failures out of 3 total attempts
+2026-01-20 16:07:34,147 - INFO - 🔄 Restarting immediately after failure...
+2026-01-20 16:07:34,147 - INFO - 
+============================================================
+2026-01-20 16:07:34,147 - INFO - 🔄 ATTEMPT #4 - Starting at 2026-01-20 16:07:34
+2026-01-20 16:07:34,147 - INFO - ============================================================
+2026-01-20 16:07:34,147 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-20 16:07:34,147 - INFO - Initializing Chrome driver...
+2026-01-20 16:07:35,288 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-20 16:07:38,969 - INFO - 
+🛑 Automation stopped by user
+2026-01-20 16:07:38,969 - INFO - 📊 Final Stats: 1 successes, 2 failures out of 4 total attempts
+2026-01-20 16:07:38,970 - INFO - ensuring close
+2026-01-20 16:07:38,970 - INFO - ensuring close
+2026-01-20 16:07:38,970 - INFO - ensuring close
+2026-01-20 16:07:38,970 - INFO - ensuring close

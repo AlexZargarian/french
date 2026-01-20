@@ -1,0 +1,42 @@
+2026-01-20 15:58:18,628 - INFO - 🔄 Starting continuous TLSContact automation...
+2026-01-20 15:58:18,629 - INFO - 📝 Logs are being saved to: tls_automation_20260120_155818.log
+2026-01-20 15:58:18,629 - INFO - 
+============================================================
+2026-01-20 15:58:18,629 - INFO - 🔄 ATTEMPT #1 - Starting at 2026-01-20 15:58:18
+2026-01-20 15:58:18,629 - INFO - ============================================================
+2026-01-20 15:58:18,629 - INFO - 🚀 Starting TLSContact Automation...
+2026-01-20 15:58:18,640 - INFO - Initializing Chrome driver...
+2026-01-20 15:58:19,661 - INFO - patching driver executable /Users/alex/Library/Application Support/undetected_chromedriver/undetected_chromedriver
+2026-01-20 15:58:22,646 - ERROR - ❌ Failed to create Chrome driver: Message: invalid argument: cannot parse capability: goog:chromeOptions
+from invalid argument: unrecognized chrome option: excludeSwitches
+Stacktrace:
+0   undetected_chromedriver             0x0000000102a83068 undetected_chromedriver + 6631528
+1   undetected_chromedriver             0x0000000102a79d1a undetected_chromedriver + 6593818
+2   undetected_chromedriver             0x000000010249accb undetected_chromedriver + 437451
+3   undetected_chromedriver             0x00000001024c7ec1 undetected_chromedriver + 622273
+4   undetected_chromedriver             0x00000001024c44c1 undetected_chromedriver + 607425
+5   undetected_chromedriver             0x000000010251f08d undetected_chromedriver + 979085
+6   undetected_chromedriver             0x000000010251ea0f undetected_chromedriver + 977423
+7   undetected_chromedriver             0x0000000102520568 undetected_chromedriver + 984424
+8   undetected_chromedriver             0x000000010252031c undetected_chromedriver + 983836
+9   undetected_chromedriver             0x00000001024defb7 undetected_chromedriver + 716727
+10  undetected_chromedriver             0x00000001024dfc81 undetected_chromedriver + 720001
+11  undetected_chromedriver             0x0000000102a40011 undetected_chromedriver + 6357009
+12  undetected_chromedriver             0x0000000102a44460 undetected_chromedriver + 6374496
+13  undetected_chromedriver             0x0000000102a1b023 undetected_chromedriver + 6205475
+14  undetected_chromedriver             0x0000000102a44ed5 undetected_chromedriver + 6377173
+15  undetected_chromedriver             0x0000000102a09f01 undetected_chromedriver + 6135553
+16  undetected_chromedriver             0x0000000102a66a98 undetected_chromedriver + 6515352
+17  undetected_chromedriver             0x0000000102a66c53 undetected_chromedriver + 6515795
+18  undetected_chromedriver             0x0000000102a7991c undetected_chromedriver + 6592796
+19  libsystem_pthread.dylib             0x00007ff80e066e4d _pthread_start + 115
+20  libsystem_pthread.dylib             0x00007ff80e062857 thread_start + 15
+
+2026-01-20 15:58:22,647 - ERROR - ❌ Could not initialize browser
+2026-01-20 15:58:22,647 - ERROR - ❌ Attempt #1 failed!
+2026-01-20 15:58:22,647 - INFO - 📊 Stats: 0 successes, 1 failures out of 1 total attempts
+2026-01-20 15:58:22,647 - INFO - ⏳ Quick retry: waiting 103 seconds before next attempt...
+2026-01-20 15:58:56,011 - INFO - 
+🛑 Automation stopped by user
+2026-01-20 15:58:56,012 - INFO - 📊 Final Stats: 0 successes, 1 failures out of 1 total attempts
+2026-01-20 15:58:56,013 - INFO - ensuring close

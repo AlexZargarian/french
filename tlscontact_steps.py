@@ -2,6 +2,8 @@ import time
 import logging
 import random
 import os
+import json
+from datetime import datetime
 
 import requests
 from selenium.webdriver.common.by import By
@@ -26,35 +28,236 @@ class TLSContactSteps:
         self.driver = driver
         self.wait = WebDriverWait(driver, 15)
 
+        # Initialize failure tracking
+        self.failure_log_file = "failure_log.json"
+        self.consecutive_failures = 0
+        self.max_consecutive_failures = 5
+        self.load_failure_count()
+        self.last_failed_step = None
+
     # -----------------------------
-    # Telegram helpers
+    # NEW: Failure tracking methods
+    # -----------------------------
+
+    def load_failure_count(self):
+        """Load consecutive failure count from file"""
+        try:
+            if os.path.exists(self.failure_log_file):
+                with open(self.failure_log_file, 'r') as f:
+                    data = json.load(f)
+                    self.consecutive_failures = data.get('consecutive_failures', 0)
+                    self.last_failed_step = data.get('last_failed_step', None)
+                    logger.info(f"Loaded failure count: {self.consecutive_failures}")
+                    if self.last_failed_step:
+                        logger.info(f"Last failed at step: {self.last_failed_step}")
+            else:
+                self.consecutive_failures = 0
+                self.last_failed_step = None
+        except Exception as e:
+            logger.warning(f"Could not load failure count: {e}")
+            self.consecutive_failures = 0
+            self.last_failed_step = None
+
+    def save_failure_count(self):
+        """Save consecutive failure count to file"""
+        try:
+            data = {
+                'consecutive_failures': self.consecutive_failures,
+                'last_failed_step': self.last_failed_step,
+                'last_updated': datetime.now().isoformat()
+            }
+            with open(self.failure_log_file, 'w') as f:
+                json.dump(data, f)
+        except Exception as e:
+            logger.warning(f"Could not save failure count: {e}")
+
+    def record_success(self):
+        """Reset failure count on successful completion"""
+        if self.consecutive_failures > 0:
+            logger.info(f"✅ Resetting failure count from {self.consecutive_failures} to 0")
+            self.consecutive_failures = 0
+            self.last_failed_step = None
+            self.save_failure_count()
+
+    def record_failure(self, step_name=None):
+        """Increment failure count and check if alert needed"""
+        self.consecutive_failures += 1
+        if step_name:
+            self.last_failed_step = step_name
+
+        logger.warning(f"❌ Failure #{self.consecutive_failures} recorded")
+        if step_name:
+            logger.warning(f"Failed at step: {step_name}")
+
+        self.save_failure_count()
+
+        # Check if we need to send alert
+        if self.consecutive_failures >= self.max_consecutive_failures:
+            self.send_error_alert()
+
+    # -----------------------------
+    # NEW: Error Telegram helper (separate from regular bot)
+    # -----------------------------
+
+    def telegram_send_error_message(self, text: str) -> bool:
+        """Send message using error-specific Telegram bot"""
+        token = os.getenv("TELEGRAM_ERROR_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_ERROR_CHAT_ID")
+
+        if not token or not chat_id:
+            logger.warning("Error Telegram env vars missing: TELEGRAM_ERROR_BOT_TOKEN / TELEGRAM_ERROR_CHAT_ID")
+            return False
+
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        try:
+            r = requests.post(url, data={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "HTML"
+            }, timeout=15)
+            if r.status_code != 200:
+                logger.warning(f"Error Telegram sendMessage failed: {r.status_code} {r.text}")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Error Telegram sendMessage error: {e}")
+            return False
+
+    def telegram_send_error_photo(self, photo_path: str, caption: str = "") -> bool:
+        """Send photo using error-specific Telegram bot"""
+        token = os.getenv("TELEGRAM_ERROR_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_ERROR_CHAT_ID")
+
+        if not token or not chat_id:
+            logger.warning("Error Telegram env vars missing: TELEGRAM_ERROR_BOT_TOKEN / TELEGRAM_ERROR_CHAT_ID")
+            return False
+
+        if not os.path.exists(photo_path):
+            logger.warning(f"Screenshot not found: {photo_path}")
+            return False
+
+        url = f"https://api.telegram.org/bot{token}/sendPhoto"
+        try:
+            with open(photo_path, "rb") as f:
+                files = {"photo": f}
+                data = {
+                    "chat_id": chat_id,
+                    "caption": caption[:1024] if caption else "",  # Telegram caption limit
+                    "parse_mode": "HTML"
+                }
+                r = requests.post(url, data=data, files=files, timeout=60)
+
+            if r.status_code != 200:
+                logger.warning(f"Error Telegram sendPhoto failed: {r.status_code} {r.text}")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Error Telegram sendPhoto error: {e}")
+            return False
+
+    # -----------------------------
+    # Error alert method (UPDATED to use error bot)
+    # -----------------------------
+
+    def send_error_alert(self):
+        """Send error alert with screenshot using error-specific bot"""
+        logger.warning(f"🚨 SENDING ERROR ALERT: {self.consecutive_failures} consecutive failures")
+
+        # Get current time and URL for context
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_url = self.driver.current_url if hasattr(self.driver, 'current_url') else "Unknown"
+        page_title = self.driver.title if hasattr(self.driver, 'title') else "Unknown"
+
+        # Create detailed error message
+        error_message = (
+            f"<b>🚨 TLSContact Automation Failed</b>\n\n"
+            f"<b>Consecutive Failures:</b> {self.consecutive_failures}\n"
+            f"<b>Time:</b> {current_time}\n"
+        )
+
+        if self.last_failed_step:
+            error_message += f"<b>Failed Step:</b> {self.last_failed_step}\n"
+
+        error_message += f"<b>URL:</b> {current_url[:200] if current_url else 'N/A'}\n"
+        error_message += f"<b>Page Title:</b> {page_title[:100] if page_title else 'N/A'}\n\n"
+        error_message += "⚠️ <b>Manual intervention required!</b>"
+
+        # Send error message via error bot
+        success = self.telegram_send_error_message(error_message)
+
+        if not success:
+            logger.error("Failed to send error message via error Telegram bot")
+            # Fallback to regular bot
+            logger.info("Trying fallback to regular Telegram bot...")
+            return self.telegram_send_message(f"⚠️ Error bot failed! {error_message}")
+
+        # Take and send screenshot
+        try:
+            screenshot_filename = f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            self.take_screenshot(screenshot_filename)
+
+            # Create screenshot caption
+            caption = (
+                f"<b>Failure Screenshot</b>\n"
+                f"Step: {self.last_failed_step or 'Unknown'}\n"
+                f"Time: {current_time}"
+            )
+
+            # Send screenshot via error bot
+            photo_sent = self.telegram_send_error_photo(screenshot_filename, caption=caption)
+
+            if not photo_sent:
+                logger.error("Failed to send screenshot via error Telegram bot")
+                # Fallback to regular bot
+                self.telegram_send_photo(screenshot_filename,
+                                         caption=f"Error bot failed! Step: {self.last_failed_step or 'Unknown'}")
+
+            # Clean up screenshot after sending
+            try:
+                if os.path.exists(screenshot_filename):
+                    os.remove(screenshot_filename)
+                    logger.info(f"Cleaned up screenshot: {screenshot_filename}")
+            except Exception as e:
+                logger.warning(f"Could not delete screenshot: {e}")
+
+            logger.info(f"✅ Error alert sent with screenshot: {screenshot_filename}")
+
+        except Exception as e:
+            logger.error(f"Failed to send error screenshot: {e}")
+            # Still send a text message about the error
+            self.telegram_send_error_message(f"⚠️ Screenshot failed: {str(e)[:100]}")
+
+    # -----------------------------
+    # Telegram helpers (regular bot for availability notifications)
     # -----------------------------
 
     def telegram_send_message(self, text: str) -> bool:
+        """Send message using regular Telegram bot (for availability notifications)"""
         token = os.getenv("TELEGRAM_BOT_TOKEN")
         chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
         if not token or not chat_id:
-            logger.warning("Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
+            logger.warning("Regular Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
             return False
 
         url = f"https://api.telegram.org/bot{token}/sendMessage"
         try:
             r = requests.post(url, data={"chat_id": chat_id, "text": text}, timeout=15)
             if r.status_code != 200:
-                logger.warning(f"Telegram sendMessage failed: {r.status_code} {r.text}")
+                logger.warning(f"Regular Telegram sendMessage failed: {r.status_code} {r.text}")
                 return False
             return True
         except Exception as e:
-            logger.warning(f"Telegram sendMessage error: {e}")
+            logger.warning(f"Regular Telegram sendMessage error: {e}")
             return False
 
     def telegram_send_photo(self, photo_path: str, caption: str = "") -> bool:
+        """Send photo using regular Telegram bot (for availability notifications)"""
         token = os.getenv("TELEGRAM_BOT_TOKEN")
         chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
         if not token or not chat_id:
-            logger.warning("Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
+            logger.warning("Regular Telegram env vars missing: TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID")
             return False
 
         if not os.path.exists(photo_path):
@@ -69,11 +272,435 @@ class TLSContactSteps:
                 r = requests.post(url, data=data, files=files, timeout=30)
 
             if r.status_code != 200:
-                logger.warning(f"Telegram sendPhoto failed: {r.status_code} {r.text}")
+                logger.warning(f"Regular Telegram sendPhoto failed: {r.status_code} {r.text}")
                 return False
             return True
         except Exception as e:
-            logger.warning(f"Telegram sendPhoto error: {e}")
+            logger.warning(f"Regular Telegram sendPhoto error: {e}")
+            return False
+
+    # -----------------------------
+    # NEW: Enhanced Human-like Behavior Methods
+    # -----------------------------
+
+    def simulate_human_pre_login_behavior(self):
+        """Simulate natural human behavior on the login page BEFORE entering credentials"""
+        logger.info("🎭 Simulating human pre-login behavior...")
+
+        try:
+            # 1. Wait naturally for page to load
+            time.sleep(random.uniform(3.0, 5.0))
+
+            # 2. Natural scrolling to explore the page
+            scroll_patterns = [
+                (-200, 400),   # Scroll down a bit
+                (100, -100),   # Scroll back up a bit
+                (-300, 300),   # Scroll down more
+            ]
+
+            for scroll_up, scroll_down in scroll_patterns:
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_up});")
+                time.sleep(random.uniform(0.5, 1.2))
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_down});")
+                time.sleep(random.uniform(0.3, 0.8))
+
+            # 3. Move mouse naturally around the page
+            self.simulate_natural_browsing_mouse_movements()
+
+            # 4. Briefly "read" the page
+            self.simulate_reading_page_content()
+
+            # 5. Natural delay before starting to type
+            time.sleep(random.uniform(1.5, 3.0))
+
+            logger.info("✅ Completed human pre-login simulation")
+            return True
+
+        except Exception as e:
+            logger.warning(f"Pre-login simulation error: {e}")
+            return True  # Continue anyway
+
+    def simulate_natural_browsing_mouse_movements(self):
+        """Simulate how a human actually moves a mouse when browsing"""
+        try:
+            actions = ActionChains(self.driver)
+
+            # Get page dimensions
+            width = self.driver.execute_script("return window.innerWidth")
+            height = self.driver.execute_script("return window.innerHeight")
+
+            # Start from a random position
+            start_x = random.randint(100, width - 200)
+            start_y = random.randint(100, height - 200)
+
+            # Move to starting position
+            actions.move_by_offset(start_x, start_y)
+            actions.pause(random.uniform(0.2, 0.4))
+
+            # Create natural wandering path
+            for i in range(random.randint(5, 10)):
+                if i % 3 == 0:
+                    # Occasionally make a larger movement
+                    offset_x = random.randint(-150, 150)
+                    offset_y = random.randint(-100, 100)
+                    duration = random.uniform(0.3, 0.6)
+                else:
+                    # Small, natural adjustments
+                    offset_x = random.randint(-30, 30)
+                    offset_y = random.randint(-20, 20)
+                    duration = random.uniform(0.1, 0.25)
+
+                actions.move_by_offset(offset_x, offset_y)
+                actions.pause(duration)
+
+                # Occasionally pause longer (like reading)
+                if random.random() < 0.2:
+                    actions.pause(random.uniform(0.5, 1.0))
+
+            actions.perform()
+            self.human_delay(0.5, 1.0)
+
+        except Exception:
+            pass
+
+    def simulate_reading_page_content(self):
+        """Simulate reading the page by hovering over text elements"""
+        try:
+            # Find text elements that a human might read
+            text_selectors = [
+                "h1", "h2", "h3",
+                "label",
+                "div[class*='text']",
+                "span[class*='label']",
+                "p", "div > strong"
+            ]
+
+            all_elements = []
+            for selector in text_selectors:
+                try:
+                    elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    visible_elements = [e for e in elements if e.is_displayed() and e.size['height'] > 0]
+                    all_elements.extend(visible_elements[:3])
+                except:
+                    continue
+
+            # Randomly select 1-3 elements to "read"
+            if all_elements:
+                elements_to_read = random.sample(
+                    all_elements,
+                    min(random.randint(1, 3), len(all_elements))
+                )
+
+                for element in elements_to_read:
+                    try:
+                        # Move to element with slight offset
+                        offset_x = random.randint(-10, 10)
+                        offset_y = random.randint(-5, 5)
+
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element_with_offset(element, offset_x, offset_y)
+
+                        # Pause as if reading
+                        text_length = len(element.text) if element.text else 0
+                        read_time = min(2.0, max(0.5, text_length / 50))
+                        actions.pause(read_time)
+
+                        actions.perform()
+
+                        # Small delay between reading different elements
+                        time.sleep(random.uniform(0.2, 0.5))
+
+                    except Exception:
+                        continue
+
+        except Exception:
+            pass
+
+    def move_to_element_human_like(self, element):
+        """Move to element with natural human cursor movement"""
+        try:
+            # Get element location
+            location = element.location_once_scrolled_into_view
+            size = element.size
+
+            # Don't move directly to center - humans are imprecise
+            target_x = location['x'] + random.randint(
+                size['width'] // 3,
+                size['width'] * 2 // 3
+            )
+            target_y = location['y'] + random.randint(
+                size['height'] // 3,
+                size['height'] * 2 // 3
+            )
+
+            # Create natural curved movement path
+            actions = ActionChains(self.driver)
+
+            # Start from current position (or random nearby)
+            current_x, current_y = 0, 0
+
+            # Add 1-2 intermediate points for natural curve
+            intermediate_points = random.randint(1, 2)
+
+            for i in range(intermediate_points):
+                # Calculate intermediate point with slight curve
+                progress = (i + 1) / (intermediate_points + 1)
+                inter_x = current_x + (target_x - current_x) * progress + random.randint(-20, 20)
+                inter_y = current_y + (target_y - current_y) * progress + random.randint(-15, 15)
+
+                # Move to intermediate point with variable speed
+                move_x = inter_x - current_x
+                move_y = inter_y - current_y
+                duration = random.uniform(0.1, 0.3) * (1 + abs(move_x + move_y) / 200)
+
+                actions.move_by_offset(move_x, move_y)
+                actions.pause(duration)
+
+                current_x, current_y = inter_x, inter_y
+
+            # Final movement to target
+            final_x = target_x - current_x
+            final_y = target_y - current_y
+            actions.move_by_offset(final_x, final_y)
+            actions.pause(random.uniform(0.05, 0.15))
+
+            actions.perform()
+            time.sleep(random.uniform(0.1, 0.3))
+
+        except Exception:
+            # Fallback to simple move
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element).perform()
+
+    def click_element_human_like(self, element):
+        """Click with human-like timing and precision"""
+        try:
+            actions = ActionChains(self.driver)
+
+            # Slight hesitation before clicking
+            actions.pause(random.uniform(0.05, 0.2))
+
+            # Click with natural press/release timing
+            actions.click_and_hold(element)
+            actions.pause(random.uniform(0.05, 0.12))
+            actions.release(element)
+
+            actions.perform()
+
+            # Natural reaction time after click
+            time.sleep(random.uniform(0.1, 0.25))
+
+        except Exception:
+            element.click()
+
+    def type_human_like(self, element, text, field_type="text"):
+        """Type text with human-like patterns"""
+        try:
+            # Clear existing text with backspacing like a human
+            current_value = element.get_attribute('value') or ''
+            if current_value:
+                # Move to end of text
+                element.send_keys(Keys.END)
+                time.sleep(random.uniform(0.1, 0.3))
+
+                # Backspace with variable speed
+                for i in range(len(current_value)):
+                    element.send_keys(Keys.BACKSPACE)
+                    if i < len(current_value) - 3:
+                        time.sleep(random.uniform(0.02, 0.06))
+                    else:
+                        time.sleep(random.uniform(0.04, 0.1))
+
+            # Type the new text with human patterns
+            for i, char in enumerate(text):
+                # Vary typing speed
+                if i == 0:  # First character
+                    delay = random.uniform(0.1, 0.2)
+                elif i < 3:  # First few characters
+                    delay = random.uniform(0.08, 0.15)
+                elif i > len(text) - 3:  # Last few characters
+                    delay = random.uniform(0.06, 0.12)
+                else:  # Middle characters
+                    delay = random.uniform(0.03, 0.08)
+
+                # Occasionally "make a mistake" and correct (5% chance)
+                if random.random() < 0.05:
+                    wrong_char = random.choice(['a', 'e', 'i', 'o', 'u', 's', 't', 'n'])
+                    element.send_keys(wrong_char)
+                    time.sleep(random.uniform(0.05, 0.15))
+                    element.send_keys(Keys.BACKSPACE)
+                    time.sleep(random.uniform(0.05, 0.15))
+
+                element.send_keys(char)
+                time.sleep(delay)
+
+                # Occasionally pause to "think" (10% chance)
+                if random.random() < 0.1:
+                    think_time = random.uniform(0.2, 0.6)
+                    time.sleep(think_time)
+
+            # Final pause after typing
+            if field_type == "password":
+                time.sleep(random.uniform(0.3, 0.8))
+            else:
+                time.sleep(random.uniform(0.2, 0.5))
+
+            return True
+
+        except Exception as e:
+            logger.warning(f"Human-like typing failed: {e}")
+            return False
+
+    def enter_credentials_human_like(self, email, password):
+        """Enter email and password with human-like patterns"""
+        logger.info("🔐 Entering credentials with human-like patterns...")
+
+        try:
+            # Find email field
+            email_selectors = [
+                "input#email-input-field",
+                "#email-input-field",
+                "input[name='username']",
+                "input[type='email']",
+                "input[autocomplete='email']"
+            ]
+
+            email_field = None
+            for selector in email_selectors:
+                try:
+                    email_field = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, selector))
+                    )
+                    if email_field.is_displayed():
+                        break
+                    else:
+                        email_field = None
+                except:
+                    continue
+
+            if not email_field:
+                logger.error("Email field not found")
+                return False
+
+            # Simulate noticing and deciding to type
+            time.sleep(random.uniform(1.0, 2.0))
+
+            # Move to email field with hesitation
+            self.move_to_element_human_like(email_field)
+            time.sleep(random.uniform(0.5, 1.2))
+
+            # Click with imprecision
+            self.click_element_human_like(email_field)
+
+            # Type email
+            self.type_human_like(email_field, email, field_type="email")
+
+            # Natural transition to password field
+            time.sleep(random.uniform(0.8, 1.5))
+
+            # Find password field
+            password_selectors = [
+                "input#password-input-field",
+                "#password-input-field",
+                "input[name='password']",
+                "input[type='password']"
+            ]
+
+            password_field = None
+            for selector in password_selectors:
+                try:
+                    password_field = self.driver.find_element(By.CSS_SELECTOR, selector)
+                    if password_field.is_displayed():
+                        break
+                except:
+                    continue
+
+            if password_field:
+                self.move_to_element_human_like(password_field)
+                time.sleep(random.uniform(0.3, 0.8))
+                self.click_element_human_like(password_field)
+            else:
+                # Press Tab as fallback
+                email_field.send_keys(Keys.TAB)
+                time.sleep(random.uniform(0.5, 1.0))
+                password_field = self.driver.switch_to.active_element
+
+            # Type password
+            self.type_human_like(password_field, password, field_type="password")
+
+            logger.info("✅ Credentials entered with human-like patterns")
+            return True
+
+        except Exception as e:
+            logger.error(f"Human-like credential entry failed: {e}")
+            return False
+
+    def handle_captcha_subtle(self):
+        """Handle CAPTCHA with minimal, human-like interaction"""
+        try:
+            # Wait to see if CAPTCHA loads naturally
+            time.sleep(random.uniform(2.0, 3.0))
+
+            # Check for CAPTCHA iframe but don't be aggressive
+            iframe_selectors = [
+                "iframe[title*='recaptcha']",
+                "iframe[src*='recaptcha']",
+                "iframe[title*='challenge']"
+            ]
+
+            for selector in iframe_selectors:
+                try:
+                    iframes = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for iframe in iframes:
+                        if iframe.is_displayed():
+                            logger.info(f"Found CAPTCHA iframe: {selector}")
+
+                            # Switch to iframe
+                            self.driver.switch_to.frame(iframe)
+
+                            # Wait a moment
+                            time.sleep(random.uniform(0.5, 1.0))
+
+                            # Look for checkbox
+                            try:
+                                checkbox = self.driver.find_element(
+                                    By.CSS_SELECTOR,
+                                    ".recaptcha-checkbox-border, div[role='checkbox']"
+                                )
+
+                                if checkbox.is_displayed():
+                                    # Move to it naturally
+                                    self.move_to_element_human_like(checkbox)
+                                    time.sleep(random.uniform(0.3, 0.7))
+
+                                    # Click naturally
+                                    self.click_element_human_like(checkbox)
+                                    logger.info("✅ Subtly clicked CAPTCHA checkbox")
+
+                                    # Switch back
+                                    self.driver.switch_to.default_content()
+
+                                    # Wait for response
+                                    time.sleep(random.uniform(2.0, 4.0))
+                                    return True
+
+                            except Exception:
+                                pass
+
+                            # Switch back if not found
+                            self.driver.switch_to.default_content()
+
+                except Exception:
+                    continue
+
+            return False
+
+        except Exception as e:
+            logger.debug(f"Subtle CAPTCHA handling: {e}")
+            try:
+                self.driver.switch_to.default_content()
+            except:
+                pass
             return False
 
     # -----------------------------
@@ -223,9 +850,12 @@ class TLSContactSteps:
             element.send_keys(Keys.DELETE)
             self.human_delay(0.2, 0.5)
 
-            for char in text:
-                element.send_keys(char)
-                time.sleep(random.uniform(0.03, 0.1))
+            # Use human-like typing
+            if not self.type_human_like(element, text):
+                # Fallback to original method
+                for char in text:
+                    element.send_keys(char)
+                    time.sleep(random.uniform(0.03, 0.1))
 
             self.human_delay(0.5, 1)
             return True
@@ -263,9 +893,12 @@ class TLSContactSteps:
             element.send_keys(Keys.DELETE)
             self.human_delay(0.2, 0.5)
 
-            for char in text:
-                element.send_keys(char)
-                time.sleep(random.uniform(0.03, 0.1))
+            # Use human-like typing
+            if not self.type_human_like(element, text, field_type="email"):
+                # Fallback
+                for char in text:
+                    element.send_keys(char)
+                    time.sleep(random.uniform(0.03, 0.1))
 
             self.human_delay(0.5, 1)
             self.driver.execute_script("arguments[0].blur();", element)
@@ -378,7 +1011,7 @@ class TLSContactSteps:
             location = element.location
             size = element.size
 
-            # Calculate target position (slightly random within element)
+            # Calculate target position
             target_x = location['x'] + random.randint(size['width'] // 4, size['width'] * 3 // 4)
             target_y = location['y'] + random.randint(size['height'] // 4, size['height'] * 3 // 4)
 
@@ -533,7 +1166,7 @@ class TLSContactSteps:
             self.driver.switch_to.default_content()
 
             if checkbox_found:
-                # Wait for CAPTCHA response (check if images appear)
+                # Wait for CAPTCHA response
                 self.human_delay(3, 5)
 
                 # Check if image selection challenge appeared
@@ -856,14 +1489,17 @@ class TLSContactSteps:
         logger.error("Could not find Continue button")
         return False
 
-    def step11_check_appointment_availability(self):
-        logger.info("Step 11: Checking appointment availability...")
+    def step11_check_appointment_availability(self, month_label="current"):
+        """Check appointment availability for a specific month"""
+        logger.info(f"Step 11: Checking {month_label} month appointment availability...")
         self.human_delay(3, 5)
         self.wait_for_page_load()
         self.remove_url_bar_focus()
         self.ensure_page_focus()
 
-        screenshot_path = "appointment_availability_check.png"
+        # Create unique screenshot filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        screenshot_path = f"appointment_{month_label}_{timestamp}.png"
         self.take_screenshot(screenshot_path)
 
         no_slots_xpaths = [
@@ -876,22 +1512,38 @@ class TLSContactSteps:
             try:
                 no_slots_element = self.driver.find_element(By.XPATH, xpath)
                 if no_slots_element.is_displayed():
-                    logger.info("No appointment slots available message detected")
-                    print("No time")
-                    # Send ONLY to Telegram channel
-                    self.telegram_send_message("❌ No time")
-                    self.telegram_send_photo(screenshot_path, caption="No time - Screenshot")
+                    logger.info(f"No appointment slots available in {month_label} month")
+                    print(f"No time ({month_label} month)")
+
+                    # Send to Telegram with month label
+                    self.telegram_send_message(f"❌ No time ({month_label} month)")
+                    self.telegram_send_photo(screenshot_path, caption=f"{month_label.capitalize()} month - No time - Screenshot")
+
+                    # Clean up screenshot after sending
+                    try:
+                        if os.path.exists(screenshot_path):
+                            os.remove(screenshot_path)
+                    except Exception:
+                        pass
+
                     return True
             except Exception:
                 continue
 
         # If no "no slots" message found
-        logger.info("Appointment slots appear to be available")
-        print("Yes time")
+        logger.info(f"Appointment slots appear to be available in {month_label} month")
+        print(f"Yes time ({month_label} month)")
 
-        # Send ONLY to Telegram channel
-        self.telegram_send_message("✅ Yes time")
-        self.telegram_send_photo(screenshot_path, caption="Yes time - Screenshot")
+        # Send to Telegram with month label
+        self.telegram_send_message(f"✅ Yes time ({month_label} month)")
+        self.telegram_send_photo(screenshot_path, caption=f"{month_label.capitalize()} month - Yes time - Screenshot")
+
+        # Clean up screenshot after sending
+        try:
+            if os.path.exists(screenshot_path):
+                os.remove(screenshot_path)
+        except Exception:
+            pass
 
         return True
 
@@ -902,7 +1554,6 @@ class TLSContactSteps:
     def step12_click_next_month(self):
         """
         Step 12: Automatically find and click the next month button
-        Example: <a data-testid="btn-next-month-available" ...>February 2026</a>
         """
         logger.info("Step 12: Looking for next month button...")
         self.human_delay(2, 4)
@@ -918,14 +1569,16 @@ class TLSContactSteps:
                 EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
             )
 
-            # Get the month text (e.g., "February 2026")
+            # Get the month text
             month_text = next_month_button.text
             logger.info(f"Found next month button: {month_text}")
 
             # Click it
             self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", next_month_button)
             self.human_delay(0.5, 1)
-            next_month_button.click()
+
+            # Use human-like click
+            self.click_element_human_like(next_month_button)
 
             logger.info(f"✅ Automatically clicked: {month_text}")
             self.wait_for_page_load()
@@ -955,7 +1608,9 @@ class TLSContactSteps:
 
                                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
                                 self.human_delay(0.5, 1)
-                                element.click()
+
+                                # Use human-like click
+                                self.click_element_human_like(element)
 
                                 logger.info(f"✅ Clicked: {element_text}")
                                 self.wait_for_page_load()
@@ -969,60 +1624,125 @@ class TLSContactSteps:
         return False
 
     # -----------------------------
-    # Main execution method (UPDATED)
+    # Main execution method (UPDATED with enhanced human-like behavior)
     # -----------------------------
 
     def execute_all_steps(self):
         logger.info("Starting TLSContact automation sequence...")
+        logger.info(f"Current consecutive failures: {self.consecutive_failures}")
 
-        if not self.step1_click_book_appointment():
-            return False
-        if not self.step2_click_france_visas_yes():
-            return False
-        if not self.step3_click_tlscontact_yes():
-            return False
-        if not self.step4_click_login_button():
-            return False
-        if not self.step5_enter_email():
-            return False
-        if not self.step6_enter_password():
-            return False
-
-        time.sleep(2)
-        self.handle_captcha_challenge()
-
-        if not self.step7_click_login_submit():
-            return False
-
-        if not self.wait_until_app_domain(prefix="https://visas-fr.tlscontact.com/en-us/", timeout=60):
-            return False
-
-        if not self.check_if_already_on_target_page():
-            if not self.step8_click_select_button():
+        try:
+            # Execute initial steps
+            if not self.step1_click_book_appointment():
+                self.record_failure("Step 1: Book appointment")
                 return False
 
-        if not self.step9_wait_for_service_level_page():
-            return False
-        if not self.step10_click_continue_button():
-            return False
-
-        # Check current month's availability
-        logger.info("=== Checking CURRENT month ===")
-        if not self.step11_check_appointment_availability():
-            return False
-
-        # Try to check next month
-        logger.info("=== Checking NEXT month ===")
-        if self.step12_click_next_month():
-            # Wait for next month to load
-            self.wait_for_page_load()
-            self.human_delay(2, 4)
-
-            # Check availability in next month
-            if not self.step11_check_appointment_availability():
+            if not self.step2_click_france_visas_yes():
+                self.record_failure("Step 2: France-Visas Yes")
                 return False
-        else:
-            logger.info("No next month available to check")
 
-        logger.info("🎉 All automation steps completed successfully!")
-        return True
+            if not self.step3_click_tlscontact_yes():
+                self.record_failure("Step 3: TLScontact Yes")
+                return False
+
+            if not self.step4_click_login_button():
+                self.record_failure("Step 4: Login button")
+                return False
+
+            # IMPORTANT: Wait for login page to fully load
+            self.wait_for_page_load(timeout=15)
+
+            # CRITICAL: Simulate human behavior BEFORE entering credentials
+            logger.info("🎭 Simulating natural human behavior on login page...")
+            self.simulate_human_pre_login_behavior()
+
+            # Get credentials
+            email = os.getenv("TLS_EMAIL", "")
+            password = os.getenv("TLS_PASSWORD", "")
+
+            if not email or not password:
+                logger.error("Email or password not set in environment variables")
+                self.record_failure("Credentials not set")
+                return False
+
+            # Enter credentials with human-like patterns
+            logger.info("🔐 Entering credentials with human-like patterns...")
+            if not self.enter_credentials_human_like(email, password):
+                # Fallback to original methods
+                logger.info("Falling back to original credential entry...")
+                if not self.step5_enter_email():
+                    self.record_failure("Step 5: Enter email")
+                    return False
+
+                time.sleep(random.uniform(1.0, 2.0))
+
+                if not self.step6_enter_password():
+                    self.record_failure("Step 6: Enter password")
+                    return False
+
+            # Natural pause before CAPTCHA
+            logger.info("⏳ Natural pause before CAPTCHA...")
+            time.sleep(random.uniform(2.0, 3.5))
+
+            # Handle CAPTCHA with subtle approach
+            logger.info("🛡️ Checking for CAPTCHA (subtle approach)...")
+            captcha_solved = self.handle_captcha_subtle()
+
+            if not captcha_solved:
+                logger.info("ℹ️ No CAPTCHA detected or already solved")
+
+            # Natural pause before submitting
+            time.sleep(random.uniform(1.0, 2.0))
+
+            if not self.step7_click_login_submit():
+                self.record_failure("Step 7: Login submit")
+                return False
+
+            if not self.wait_until_app_domain(prefix="https://visas-fr.tlscontact.com/en-us/", timeout=60):
+                self.record_failure("Step 7b: Wait for app domain")
+                return False
+
+            if not self.check_if_already_on_target_page():
+                if not self.step8_click_select_button():
+                    self.record_failure("Step 8: Select button")
+                    return False
+
+            if not self.step9_wait_for_service_level_page():
+                self.record_failure("Step 9: Service level page")
+                return False
+
+            if not self.step10_click_continue_button():
+                self.record_failure("Step 10: Continue button")
+                return False
+
+            # Check current month's availability
+            logger.info("=== Checking CURRENT month ===")
+            if not self.step11_check_appointment_availability(month_label="current"):
+                self.record_failure("Step 11: Check availability (current month)")
+                return False
+
+            # Try to check next month
+            logger.info("=== Checking NEXT month ===")
+            if self.step12_click_next_month():
+                # Wait for next month to load
+                self.wait_for_page_load()
+                self.human_delay(2, 4)
+
+                # Check availability in next month
+                if not self.step11_check_appointment_availability(month_label="next"):
+                    self.record_failure("Step 11: Check availability (next month)")
+                    return False
+            else:
+                logger.info("No next month available to check")
+
+            # SUCCESS: Reset failure count
+            self.record_success()
+            logger.info("🎉 All automation steps completed successfully!")
+            return True
+
+        except Exception as e:
+            logger.error(f"Unexpected error in execute_all_steps: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            self.record_failure(f"Unexpected error: {str(e)[:50]}")
+            return False
