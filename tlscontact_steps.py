@@ -36,7 +36,297 @@ class TLSContactSteps:
         self.last_failed_step = None
 
     # -----------------------------
-    # NEW: Failure tracking methods
+    # NEW: Ultra-Human-like CAPTCHA Clicking Methods
+    # -----------------------------
+
+    def simulate_reading_captcha(self):
+        """Simulate reading the CAPTCHA text like a human"""
+        logger.info("Reading CAPTCHA text like a human...")
+
+        # Humans don't instantly react - they read first
+        reading_time = random.uniform(1.5, 3.5)
+        logger.info(f"Pausing {reading_time:.1f} seconds as if reading CAPTCHA")
+        time.sleep(reading_time)
+
+        # Sometimes humans glance away and back
+        if random.random() < 0.3:  # 30% chance
+            glance_time = random.uniform(0.5, 1.2)
+            logger.info(f"Glancing away for {glance_time:.1f} seconds")
+            time.sleep(glance_time)
+
+    def create_human_mouse_path(self, element, start_x=None, start_y=None):
+        """Create a human-like mouse movement path to the element"""
+        try:
+            # Get element location and size
+            location = element.location_once_scrolled_into_view
+            size = element.size
+
+            # Target within the element (not perfect center)
+            target_x = location['x'] + random.randint(
+                int(size['width'] * 0.3),
+                int(size['width'] * 0.7)
+            )
+            target_y = location['y'] + random.randint(
+                int(size['height'] * 0.3),
+                int(size['height'] * 0.7)
+            )
+
+            # If no start position provided, start near current position
+            if start_x is None or start_y is None:
+                start_x = random.randint(100, 300)
+                start_y = random.randint(100, 300)
+
+            actions = ActionChains(self.driver)
+
+            # Start from current position
+            actions.move_by_offset(start_x, start_y)
+
+            # Create natural path with 2-3 intermediate points
+            num_points = random.randint(2, 3)
+
+            for i in range(num_points):
+                # Calculate point along the path with slight curve
+                progress = (i + 1) / (num_points + 1)
+
+                # Add natural curve (bezier-like)
+                curve_offset_x = random.randint(-25, 25)
+                curve_offset_y = random.randint(-15, 15)
+
+                inter_x = start_x + (target_x - start_x) * progress + curve_offset_x
+                inter_y = start_y + (target_y - start_y) * progress + curve_offset_y
+
+                # Calculate distance for speed variation
+                distance_x = inter_x - (start_x if i == 0 else prev_x)
+                distance_y = inter_y - (start_y if i == 0 else prev_y)
+                distance = (distance_x**2 + distance_y**2)**0.5
+
+                # Vary speed - faster for longer distances, slower for short
+                speed_factor = 0.1 + (distance / 500) * 0.3
+                duration = random.uniform(0.08, 0.15) * speed_factor
+
+                actions.move_by_offset(distance_x, distance_y)
+                actions.pause(duration)
+
+                # Sometimes pause briefly during movement (like human hesitation)
+                if random.random() < 0.2:
+                    actions.pause(random.uniform(0.05, 0.1))
+
+                prev_x, prev_y = inter_x, inter_y
+
+            # Final movement to target
+            final_x = target_x - prev_x
+            final_y = target_y - prev_y
+            final_distance = (final_x**2 + final_y**2)**0.5
+            final_duration = random.uniform(0.05, 0.1) * (1 + final_distance / 300)
+
+            actions.move_by_offset(final_x, final_y)
+            actions.pause(final_duration)
+
+            # Slight overshoot then correction (very human-like)
+            if random.random() < 0.4:  # 40% chance
+                overshoot_x = random.randint(-5, 5)
+                overshoot_y = random.randint(-3, 3)
+                actions.move_by_offset(overshoot_x, overshoot_y)
+                actions.pause(0.02)
+                actions.move_by_offset(-overshoot_x, -overshoot_y)
+                actions.pause(0.02)
+
+            actions.perform()
+
+            # Small pause at target (like aiming)
+            time.sleep(random.uniform(0.05, 0.12))
+
+            return target_x, target_y
+
+        except Exception as e:
+            logger.warning(f"Human mouse path creation failed: {e}")
+            # Fallback: just move to element
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element).perform()
+            time.sleep(random.uniform(0.1, 0.2))
+            return None, None
+
+    def human_click_with_variation(self, element):
+        """Click with human-like variations in timing and pressure"""
+        try:
+            actions = ActionChains(self.driver)
+
+            # 1. Pre-click hesitation (humans don't click instantly)
+            hesitation = random.uniform(0.1, 0.25)
+            actions.pause(hesitation)
+
+            # 2. Press down with variable timing
+            press_duration = random.uniform(0.03, 0.08)
+
+            # 3. Sometimes click quickly, sometimes more deliberately
+            if random.random() < 0.7:  # 70%: normal click
+                actions.click_and_hold(element)
+                actions.pause(press_duration)
+                actions.release(element)
+            else:  # 30%: more deliberate click (slightly longer)
+                actions.click_and_hold(element)
+                actions.pause(press_duration * 1.5)  # Longer hold
+                actions.release(element)
+
+            actions.perform()
+
+            # 4. Post-click reaction time
+            reaction_time = random.uniform(0.05, 0.15)
+            time.sleep(reaction_time)
+
+            # 5. Sometimes move mouse away after clicking
+            if random.random() < 0.6:  # 60% chance
+                move_away_x = random.randint(-20, 20)
+                move_away_y = random.randint(-10, 10)
+                actions = ActionChains(self.driver)
+                actions.move_by_offset(move_away_x, move_away_y)
+                actions.perform()
+                time.sleep(random.uniform(0.05, 0.1))
+
+            logger.info("✅ Human-like click performed")
+
+        except Exception as e:
+            logger.warning(f"Human click failed: {e}")
+            # Fallback
+            element.click()
+
+    def simulate_human_decision_making(self):
+        """Simulate the human decision-making process before clicking CAPTCHA"""
+        # Humans don't just click - they think about it
+        logger.info("Simulating human decision-making...")
+
+        # Random decision process timing
+        decision_phases = random.randint(1, 3)
+
+        for phase in range(decision_phases):
+            # Small pauses while "thinking"
+            think_time = random.uniform(0.3, 0.8)
+            time.sleep(think_time)
+
+            # Sometimes move mouse slightly while thinking
+            if random.random() < 0.4:
+                actions = ActionChains(self.driver)
+                actions.move_by_offset(
+                    random.randint(-15, 15),
+                    random.randint(-10, 10)
+                ).pause(0.1).perform()
+
+        # Final decision pause
+        final_pause = random.uniform(0.2, 0.5)
+        time.sleep(final_pause)
+
+    def handle_captcha_ultra_human(self):
+        """
+        Ultra-human-like CAPTCHA handling that mimics exactly how a human would do it
+        """
+        logger.info("🤔 Starting ultra-human-like CAPTCHA handling...")
+
+        try:
+            # Wait a natural amount of time before even looking for CAPTCHA
+            time.sleep(random.uniform(2.0, 3.5))
+
+            # Look for CAPTCHA iframes naturally
+            iframe_selectors = [
+                "iframe[title*='recaptcha']",
+                "iframe[src*='recaptcha']",
+                "iframe[title*='challenge']",
+                "iframe[title*='I'm not a robot']",
+                "iframe[title*='checkbox']"
+            ]
+
+            captcha_found = False
+            for selector in iframe_selectors:
+                try:
+                    iframes = self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    for iframe in iframes:
+                        if iframe.is_displayed():
+                            logger.info(f"Found CAPTCHA iframe: {selector}")
+                            captcha_found = True
+
+                            # Switch to iframe
+                            self.driver.switch_to.frame(iframe)
+
+                            # Human-like behavior: look at CAPTCHA
+                            self.simulate_reading_captcha()
+
+                            # Try different checkbox selectors
+                            checkbox_selectors = [
+                                ".recaptcha-checkbox-border",
+                                ".recaptcha-checkbox",
+                                "div[role='checkbox']",
+                                "#recaptcha-anchor",
+                                "span.recaptcha-checkbox"
+                            ]
+
+                            checkbox = None
+                            for cb_selector in checkbox_selectors:
+                                try:
+                                    checkbox = self.driver.find_element(By.CSS_SELECTOR, cb_selector)
+                                    if checkbox.is_displayed():
+                                        logger.info(f"Found CAPTCHA checkbox: {cb_selector}")
+                                        break
+                                except:
+                                    continue
+
+                            if checkbox:
+                                # Scroll to make it visible (like a human would)
+                                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox)
+                                time.sleep(random.uniform(0.3, 0.7))
+
+                                # Simulate decision-making process
+                                self.simulate_human_decision_making()
+
+                                # Move to checkbox with ultra-human-like path
+                                logger.info("Moving to CAPTCHA checkbox like a human...")
+                                self.create_human_mouse_path(checkbox)
+
+                                # Final hesitation before click
+                                time.sleep(random.uniform(0.1, 0.3))
+
+                                # Perform ultra-human-like click
+                                logger.info("Clicking CAPTCHA checkbox with human-like variations...")
+                                self.human_click_with_variation(checkbox)
+
+                                # Switch back to main content
+                                self.driver.switch_to.default_content()
+
+                                # Natural waiting for response
+                                wait_time = random.uniform(2.5, 4.5)
+                                logger.info(f"Waiting {wait_time:.1f}s for CAPTCHA response (natural human wait)")
+                                time.sleep(wait_time)
+
+                                # Check if image challenge appeared
+                                if self.check_for_image_challenge():
+                                    logger.warning("⚠️ Image selection challenge appeared")
+                                    # Don't try to solve it, just report
+                                    self.driver.switch_to.default_content()
+                                    return False
+                                else:
+                                    logger.info("✅ CAPTCHA clicked successfully with ultra-human-like behavior")
+                                    return True
+
+                            # Switch back if checkbox not found
+                            self.driver.switch_to.default_content()
+
+                except Exception as e:
+                    logger.debug(f"Trying selector {selector}: {e}")
+                    continue
+
+            if not captcha_found:
+                logger.info("ℹ️ No CAPTCHA iframe found")
+
+            return False
+
+        except Exception as e:
+            logger.warning(f"Ultra-human CAPTCHA handling error: {e}")
+            try:
+                self.driver.switch_to.default_content()
+            except:
+                pass
+            return False
+
+    # -----------------------------
+    # Failure tracking methods
     # -----------------------------
 
     def load_failure_count(self):
@@ -96,7 +386,7 @@ class TLSContactSteps:
             self.send_error_alert()
 
     # -----------------------------
-    # NEW: Error Telegram helper (separate from regular bot)
+    # Error Telegram helper (separate from regular bot)
     # -----------------------------
 
     def telegram_send_error_message(self, text: str) -> bool:
@@ -280,7 +570,7 @@ class TLSContactSteps:
             return False
 
     # -----------------------------
-    # NEW: Enhanced Human-like Behavior Methods
+    # Enhanced Human-like Behavior Methods
     # -----------------------------
 
     def simulate_human_pre_login_behavior(self):
@@ -635,73 +925,13 @@ class TLSContactSteps:
             logger.error(f"Human-like credential entry failed: {e}")
             return False
 
+    # -----------------------------
+    # UPDATED: handle_captcha_subtle now uses ultra-human approach
+    # -----------------------------
+
     def handle_captcha_subtle(self):
-        """Handle CAPTCHA with minimal, human-like interaction"""
-        try:
-            # Wait to see if CAPTCHA loads naturally
-            time.sleep(random.uniform(2.0, 3.0))
-
-            # Check for CAPTCHA iframe but don't be aggressive
-            iframe_selectors = [
-                "iframe[title*='recaptcha']",
-                "iframe[src*='recaptcha']",
-                "iframe[title*='challenge']"
-            ]
-
-            for selector in iframe_selectors:
-                try:
-                    iframes = self.driver.find_elements(By.CSS_SELECTOR, selector)
-                    for iframe in iframes:
-                        if iframe.is_displayed():
-                            logger.info(f"Found CAPTCHA iframe: {selector}")
-
-                            # Switch to iframe
-                            self.driver.switch_to.frame(iframe)
-
-                            # Wait a moment
-                            time.sleep(random.uniform(0.5, 1.0))
-
-                            # Look for checkbox
-                            try:
-                                checkbox = self.driver.find_element(
-                                    By.CSS_SELECTOR,
-                                    ".recaptcha-checkbox-border, div[role='checkbox']"
-                                )
-
-                                if checkbox.is_displayed():
-                                    # Move to it naturally
-                                    self.move_to_element_human_like(checkbox)
-                                    time.sleep(random.uniform(0.3, 0.7))
-
-                                    # Click naturally
-                                    self.click_element_human_like(checkbox)
-                                    logger.info("✅ Subtly clicked CAPTCHA checkbox")
-
-                                    # Switch back
-                                    self.driver.switch_to.default_content()
-
-                                    # Wait for response
-                                    time.sleep(random.uniform(2.0, 4.0))
-                                    return True
-
-                            except Exception:
-                                pass
-
-                            # Switch back if not found
-                            self.driver.switch_to.default_content()
-
-                except Exception:
-                    continue
-
-            return False
-
-        except Exception as e:
-            logger.debug(f"Subtle CAPTCHA handling: {e}")
-            try:
-                self.driver.switch_to.default_content()
-            except:
-                pass
-            return False
+        """Use ultra-human-like approach for CAPTCHA"""
+        return self.handle_captcha_ultra_human()
 
     # -----------------------------
     # Utilities
@@ -1624,7 +1854,7 @@ class TLSContactSteps:
         return False
 
     # -----------------------------
-    # Main execution method (UPDATED with enhanced human-like behavior)
+    # Main execution method (UPDATED with ultra-human-like CAPTCHA)
     # -----------------------------
 
     def execute_all_steps(self):
@@ -1684,12 +1914,12 @@ class TLSContactSteps:
             logger.info("⏳ Natural pause before CAPTCHA...")
             time.sleep(random.uniform(2.0, 3.5))
 
-            # Handle CAPTCHA with subtle approach
-            logger.info("🛡️ Checking for CAPTCHA (subtle approach)...")
-            captcha_solved = self.handle_captcha_subtle()
+            # USE ULTRA-HUMAN CAPTCHA HANDLING
+            logger.info("🎯 Using ultra-human-like CAPTCHA handling...")
+            captcha_result = self.handle_captcha_ultra_human()
 
-            if not captcha_solved:
-                logger.info("ℹ️ No CAPTCHA detected or already solved")
+            if not captcha_result:
+                logger.info("ℹ️ No CAPTCHA detected or could not solve")
 
             # Natural pause before submitting
             time.sleep(random.uniform(1.0, 2.0))
