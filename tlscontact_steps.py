@@ -345,6 +345,218 @@ class TLSContactSteps:
         return "workflow/service-level" in current_url or "/workflow" in current_url
 
     # -----------------------------
+    # Enhanced CAPTCHA handler methods
+    # -----------------------------
+
+    def simulate_human_mouse_movement(self):
+        """Simulate human-like mouse movements"""
+        try:
+            # Get current mouse position
+            start_x = random.randint(100, 500)
+            start_y = random.randint(100, 500)
+
+            # Create human-like mouse movement
+            actions = ActionChains(self.driver)
+
+            # Move mouse in small random patterns
+            for i in range(random.randint(2, 4)):
+                offset_x = random.randint(-30, 30)
+                offset_y = random.randint(-20, 20)
+                duration = random.uniform(0.1, 0.3)
+                actions.move_by_offset(offset_x, offset_y).pause(duration)
+
+            actions.perform()
+            self.human_delay(0.2, 0.5)
+
+        except Exception:
+            pass
+
+    def move_mouse_like_human(self, element):
+        """Move mouse to element with human-like motion"""
+        try:
+            # Get element location
+            location = element.location
+            size = element.size
+
+            # Calculate target position (slightly random within element)
+            target_x = location['x'] + random.randint(size['width'] // 4, size['width'] * 3 // 4)
+            target_y = location['y'] + random.randint(size['height'] // 4, size['height'] * 3 // 4)
+
+            # Create curved mouse movement
+            actions = ActionChains(self.driver)
+
+            # Start from random position
+            start_x = random.randint(50, 200)
+            start_y = random.randint(50, 200)
+            actions.move_by_offset(start_x, start_y)
+
+            # Create slight curve in movement
+            mid_x = (start_x + target_x) // 2 + random.randint(-20, 20)
+            mid_y = (start_y + target_y) // 2 + random.randint(-15, 15)
+
+            # Move with varying speed
+            actions.move_by_offset(mid_x - start_x, mid_y - start_y).pause(random.uniform(0.05, 0.15))
+            actions.move_by_offset(target_x - mid_x, target_y - mid_y).pause(random.uniform(0.05, 0.15))
+
+            actions.perform()
+            self.human_delay(0.1, 0.3)
+
+        except Exception:
+            # Fallback to simple movement
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element).perform()
+
+    def human_click(self, element):
+        """Click with human-like behavior"""
+        try:
+            actions = ActionChains(self.driver)
+
+            # Slight hesitation before click
+            actions.pause(random.uniform(0.05, 0.15))
+
+            # Click with slight mouse down/up timing variation
+            actions.click_and_hold(element).pause(random.uniform(0.05, 0.1))
+            actions.release(element)
+
+            actions.perform()
+
+            # Small random delay after click
+            time.sleep(random.uniform(0.1, 0.3))
+
+        except Exception:
+            # Fallback to regular click
+            element.click()
+
+    def check_for_image_challenge(self):
+        """Check if image selection challenge appeared"""
+        try:
+            # Look for image grid or image selection elements
+            image_challenge_selectors = [
+                "//div[contains(@class, 'rc-imageselect')]",
+                "//div[contains(text(), 'Select all')]",
+                "//img[contains(@src, 'image') and contains(@alt, 'CAPTCHA')]",
+                "//div[@role='heading' and contains(text(), 'image')]",
+            ]
+
+            for xpath in image_challenge_selectors:
+                try:
+                    elements = self.driver.find_elements(By.XPATH, xpath)
+                    if elements and any(el.is_displayed() for el in elements):
+                        logger.warning(f"Image challenge detected: {xpath}")
+                        return True
+                except Exception:
+                    continue
+
+            return False
+
+        except Exception:
+            return False
+
+    def handle_captcha_challenge(self, timeout=15):
+        """
+        Enhanced CAPTCHA handler with human-like behavior simulation.
+        """
+        logger.info("🛡️ Checking for CAPTCHA iframe...")
+
+        try:
+            # Look for different CAPTCHA iframes
+            iframe_xpaths = [
+                "//iframe[contains(@title, 'challenge') or contains(@title, 'CAPTCHA')]",
+                "//iframe[contains(@src, 'recaptcha') or contains(@src, 'captcha')]",
+                "//iframe[contains(@src, 'google.com/recaptcha')]",
+                "//iframe[@role='presentation']",
+                "//iframe[starts-with(@src, 'https://www.google.com/recaptcha')]"
+            ]
+
+            captcha_iframe = None
+            for xpath in iframe_xpaths:
+                try:
+                    captcha_iframe = WebDriverWait(self.driver, 5).until(
+                        EC.presence_of_element_located((By.XPATH, xpath))
+                    )
+                    logger.info(f"Found CAPTCHA iframe with XPath: {xpath}")
+                    break
+                except TimeoutException:
+                    continue
+
+            if not captcha_iframe:
+                logger.info("ℹ️ No CAPTCHA iframe detected.")
+                return False
+
+            # Switch to CAPTCHA iframe
+            self.driver.switch_to.frame(captcha_iframe)
+            logger.info("➡️ Focus switched to CAPTCHA iframe.")
+
+            # Simulate human-like mouse movement before clicking
+            self.simulate_human_mouse_movement()
+
+            # Try to find and click the checkbox
+            checkbox_found = False
+
+            # Try multiple checkbox selectors
+            checkbox_selectors = [
+                (By.ID, "recaptcha-anchor"),
+                (By.CLASS_NAME, "recaptcha-checkbox"),
+                (By.CSS_SELECTOR, "div.recaptcha-checkbox-border"),
+                (By.CSS_SELECTOR, "div.recaptcha-checkbox"),
+                (By.CSS_SELECTOR, "span.recaptcha-checkbox"),
+                (By.CSS_SELECTOR, "div[role='checkbox']"),
+                (By.XPATH, "//div[@role='checkbox' or @aria-checked]"),
+            ]
+
+            for by, selector in checkbox_selectors:
+                try:
+                    checkbox = WebDriverWait(self.driver, 3).until(
+                        EC.element_to_be_clickable((by, selector))
+                    )
+
+                    if checkbox.is_displayed() and checkbox.is_enabled():
+                        logger.info(f"Found checkbox: {selector}")
+
+                        # Simulate human hesitation before clicking
+                        self.human_delay(0.8, 1.5)
+
+                        # Move mouse to checkbox with human-like motion
+                        self.move_mouse_like_human(checkbox)
+
+                        # Click with slight random offset
+                        self.human_click(checkbox)
+
+                        checkbox_found = True
+                        logger.info(f"✅ Clicked checkbox: {selector}")
+                        break
+
+                except Exception:
+                    continue
+
+            # Switch back to main content
+            self.driver.switch_to.default_content()
+
+            if checkbox_found:
+                # Wait for CAPTCHA response (check if images appear)
+                self.human_delay(3, 5)
+
+                # Check if image selection challenge appeared
+                if self.check_for_image_challenge():
+                    logger.warning("⚠️ Image selection challenge appeared (CAPTCHA not solved)")
+                    return False
+                else:
+                    logger.info("✅ CAPTCHA checkbox clicked successfully")
+                    return True
+            else:
+                logger.info("ℹ️ No checkbox found in CAPTCHA iframe")
+                return False
+
+        except TimeoutException:
+            logger.info("ℹ️ No CAPTCHA iframe detected within timeout.")
+            self.driver.switch_to.default_content()
+            return False
+        except Exception as e:
+            logger.warning(f"⚠️ CAPTCHA handler error: {e}")
+            self.driver.switch_to.default_content()
+            return False
+
+    # -----------------------------
     # Steps (your existing flow)
     # -----------------------------
 
@@ -511,62 +723,6 @@ class TLSContactSteps:
 
         logger.error("Could not find password input field")
         return False
-
-    def handle_captcha_challenge(self, timeout=12):
-        """
-        Detects a CAPTCHA iframe and attempts to interact with it.
-        Note: Many CAPTCHAs are designed to block automation.
-        """
-        logger.info("🛡️ Checking for CAPTCHA iframe...")
-        try:
-            iframe_xpath = (
-                "//iframe[contains(@title, 'challenge') "
-                "or contains(@src, 'captcha') "
-                "or contains(@title, 'reCAPTCHA')]"
-            )
-
-            captcha_iframe = WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((By.XPATH, iframe_xpath))
-            )
-
-            self.driver.switch_to.frame(captcha_iframe)
-            logger.info("➡️ Focus switched to CAPTCHA iframe.")
-
-            # If your site sometimes uses a simple checkbox, this tries to click it.
-            checkbox_selectors = [
-                (By.ID, "recaptcha-anchor"),
-                (By.CSS_SELECTOR, "input[type='checkbox']"),
-            ]
-
-            clicked = False
-            for by, sel in checkbox_selectors:
-                try:
-                    checkbox = self.driver.find_element(by, sel)
-                    if checkbox.is_displayed() and checkbox.is_enabled():
-                        self.human_delay(0.6, 1.4)
-                        ActionChains(self.driver).move_to_element(checkbox).pause(
-                            random.uniform(0.2, 0.5)
-                        ).click().perform()
-                        logger.info(f"✅ Clicked checkbox: {sel}")
-                        clicked = True
-                        break
-                except Exception:
-                    continue
-
-            if clicked:
-                time.sleep(3)
-
-            self.driver.switch_to.default_content()
-            return clicked
-
-        except TimeoutException:
-            logger.info("ℹ️ No CAPTCHA iframe detected within timeout.")
-            self.driver.switch_to.default_content()
-            return False
-        except Exception as e:
-            logger.warning(f"⚠️ CAPTCHA handler error: {e}")
-            self.driver.switch_to.default_content()
-            return False
 
     def step7_click_login_submit(self):
         logger.info("Step 7: Clicking Login submit button...")
@@ -739,6 +895,83 @@ class TLSContactSteps:
 
         return True
 
+    # -----------------------------
+    # NEW STEP 12: Click next month button
+    # -----------------------------
+
+    def step12_click_next_month(self):
+        """
+        Step 12: Automatically find and click the next month button
+        Example: <a data-testid="btn-next-month-available" ...>February 2026</a>
+        """
+        logger.info("Step 12: Looking for next month button...")
+        self.human_delay(2, 4)
+        self.remove_url_bar_focus()
+        self.ensure_page_focus()
+
+        # First try: Your specific selector from screenshot
+        selector = "a[data-testid='btn-next-month-available']"
+
+        try:
+            # Wait for the button to be available
+            next_month_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
+            )
+
+            # Get the month text (e.g., "February 2026")
+            month_text = next_month_button.text
+            logger.info(f"Found next month button: {month_text}")
+
+            # Click it
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", next_month_button)
+            self.human_delay(0.5, 1)
+            next_month_button.click()
+
+            logger.info(f"✅ Automatically clicked: {month_text}")
+            self.wait_for_page_load()
+            return True
+
+        except TimeoutException:
+            logger.info("No next month button found with specific selector, trying other methods...")
+
+        # Second try: Look for any next month button
+        alternative_selectors = [
+            "a[data-testid*='next-month']",
+            "a[href*='month=']",
+            "button[data-testid*='next-month']",
+            "a:contains('Next')",
+            "button:contains('Next')",
+        ]
+
+        for alt_selector in alternative_selectors:
+            try:
+                elements = self.driver.find_elements(By.CSS_SELECTOR, alt_selector)
+                for element in elements:
+                    try:
+                        if element.is_displayed() and element.is_enabled():
+                            element_text = element.text
+                            if element_text and ('202' in element_text or 'Next' in element_text):
+                                logger.info(f"Found alternative next month button: {element_text}")
+
+                                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+                                self.human_delay(0.5, 1)
+                                element.click()
+
+                                logger.info(f"✅ Clicked: {element_text}")
+                                self.wait_for_page_load()
+                                return True
+                    except Exception:
+                        continue
+            except Exception:
+                continue
+
+        logger.info("No next month button found (already on last available month)")
+        return False
+
+    # -----------------------------
+    # Main execution method (UPDATED)
+    # -----------------------------
+
     def execute_all_steps(self):
         logger.info("Starting TLSContact automation sequence...")
 
@@ -772,8 +1005,24 @@ class TLSContactSteps:
             return False
         if not self.step10_click_continue_button():
             return False
+
+        # Check current month's availability
+        logger.info("=== Checking CURRENT month ===")
         if not self.step11_check_appointment_availability():
             return False
+
+        # Try to check next month
+        logger.info("=== Checking NEXT month ===")
+        if self.step12_click_next_month():
+            # Wait for next month to load
+            self.wait_for_page_load()
+            self.human_delay(2, 4)
+
+            # Check availability in next month
+            if not self.step11_check_appointment_availability():
+                return False
+        else:
+            logger.info("No next month available to check")
 
         logger.info("🎉 All automation steps completed successfully!")
         return True
